@@ -4,6 +4,7 @@ import { FaCamera } from "react-icons/fa";
 import ContextMenu from "./ContextMenu";
 
 function Avatar({ type, image, setImage }) {
+  
   const [hover, setHover] = useState(false);
   const [isContextMenue, setIsContextMenue] = useState(false);
   const [contextMenueCordinates, setContextMenueCordinates] = useState({
@@ -14,7 +15,9 @@ function Avatar({ type, image, setImage }) {
     {name:"Take photo", callback: ()=>{}},
     {name:"Choose from Library", callback: ()=>{}},
     {name:"Upload photo", callback: ()=>{}},
-    {name:"Remove photo", callback: ()=>{}}
+    {name:"Remove photo", callback: ()=>{
+      setImage("/default_avatar.png");
+    }}
 
   ]
 
