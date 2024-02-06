@@ -1,0 +1,30 @@
+import React from "react";
+import Image from "next/image";
+
+function Avatar({ type, image, setImage }) {
+  return (
+    <>
+      <div className="flex items-center justify-center">
+        {type === "sm" && (
+          <div className=" relative h-10 w-10">
+            <Image src={image} alt="Avatar" className=" rounded-full" fill />
+          </div>
+        )}
+        {type === "lg" && (
+          <div className=" relative h-14 w-14">
+            <Image src={image} alt="Avatar" className=" rounded-full" fill />
+          </div>
+        )}
+        {type === "xl" && (
+          <div className="relative z-0 cursor-pointer">
+            <div className=" h-60 w-60">
+              <Image src={image} alt="Avatar" className=" rounded-full" fill />
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default Avatar;
