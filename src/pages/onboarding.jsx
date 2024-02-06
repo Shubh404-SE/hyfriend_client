@@ -2,14 +2,15 @@ import { useStateProvider } from "@/context/StateContext";
 import Image from "next/image";
 import React, { useState } from "react";
 import Input from "@/components/common/Input";
+import Avatar from "@/components/common/Avatar";
 
 function onboarding() {
   const [{ userInfo }] = useStateProvider();
 
-  const [name, setName] = useState(userInfo.name || "");
-  const [email, setEmail] = useState(userInfo.email || "");
+  const [name, setName] = useState(userInfo? userInfo.name : "");
+  const [email, setEmail] = useState(userInfo ? userInfo.email: "");
   const [imgUrl, setImg] = useState(
-    userInfo.profilePhoto || "/default_avatar.png"
+    userInfo ? userInfo.profilePhoto : "/default_avatar.png"
   );
 
   return (
@@ -33,6 +34,9 @@ function onboarding() {
             setState={setEmail}
             label={true}
           />
+        </div>
+        <div>
+          <Avatar type="xl" image={imgUrl} setImage={setImg} /> 
         </div>
       </div>
     </div>
