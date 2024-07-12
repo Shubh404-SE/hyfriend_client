@@ -3,11 +3,13 @@ import Image from "next/image";
 import { FaCamera } from "react-icons/fa";
 import ContextMenu from "./ContextMenu";
 import PhotoPicker from "./PhotoPicker";
+import PhotoLibrary from "./PhotoLibrary";
 
 function Avatar({ type, image, setImage }) {
   
   const [hover, setHover] = useState(false);
   const [isContextMenue, setIsContextMenue] = useState(false);
+  const [showPhotoLibrary, setShowPhotoLibrary] = useState(false);
   const [contextMenueCordinates, setContextMenueCordinates] = useState({
     x: 0,
     y: 0,
@@ -30,7 +32,9 @@ function Avatar({ type, image, setImage }) {
 
   const contextMenuOptions = [
     {name:"Take photo", callback: ()=>{}},
-    {name:"Choose from Library", callback: ()=>{}},
+    {name:"Choose from Library", callback: ()=>{
+        setShowPhotoLibrary(true);
+    }},
     {name:"Upload photo", callback: ()=>{
       setGrabPhoto(true);
     }},
@@ -114,9 +118,9 @@ function Avatar({ type, image, setImage }) {
             setContextMenu={setIsContextMenue}
              />
           }
-          {
-            grabPhoto && <PhotoPicker onChange={photoPickerChange} />
-          }
+          {grabPhoto && <PhotoPicker onChange={photoPickerChange} />}
+
+          {showPhotoLibrary && <PhotoLibrary setImage={setImage} hidePhotoLibrary={setShowPhotoLibrary} />}
         </div>
       </div>
     </>
