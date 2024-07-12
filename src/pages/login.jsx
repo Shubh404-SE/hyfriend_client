@@ -21,9 +21,10 @@ function login() {
 
   const signinWithGoogle = async () => {
     try {
-      const {user: {displayName:name, email, photoUrl: profileImage}} =  await signInWithPopup(firebaseAuth, gprovider);
+      const {user} =  await signInWithPopup(firebaseAuth, gprovider);
+      const { displayName: name, email, photoURL:profileImage } = user;
       if(email){
-        console.log(email);
+        // console.log(email);
         // add query to add data in database
         const {data} = await axios.post(CHECK_USER_ROUTE, {email});
         if(!data.status){
