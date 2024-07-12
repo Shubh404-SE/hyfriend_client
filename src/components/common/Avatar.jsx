@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { FaCamera } from "react-icons/fa";
 import ContextMenu from "./ContextMenu";
+import PhotoPicker from "./PhotoPicker";
 
 function Avatar({ type, image, setImage }) {
   
@@ -11,10 +12,28 @@ function Avatar({ type, image, setImage }) {
     x: 0,
     y: 0,
   });
+  const [grabPhoto, setGrabPhoto] = useState(false);
+
+
+  useEffect(()=>{
+    if(grabPhoto){
+      const data = document.getElementById("photo-picker");
+      data.click();
+      document.body.onfocus =(e) =>{
+        setTimeout(()=>{
+          setGrabPhoto(false);
+        }, 1000);
+      }
+    }
+  }, [grabPhoto]);
+
+
   const contextMenuOptions = [
     {name:"Take photo", callback: ()=>{}},
     {name:"Choose from Library", callback: ()=>{}},
-    {name:"Upload photo", callback: ()=>{}},
+    {name:"Upload photo", callback: ()=>{
+      setGrabPhoto(true);
+    }},
     {name:"Remove photo", callback: ()=>{
       setImage("/default_avatar.png");
     }}
@@ -27,6 +46,20 @@ function Avatar({ type, image, setImage }) {
     setContextMenueCordinates({ x: e.pageX, y: e.pageY
     });
   };
+
+  const photoPickerChange = async(e)=>{
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    const data = document.createElement('img');
+    reader.onload = function(event){
+      data.src = event.target.result;
+      data.setAttribute('data-src', event.target.result);
+    }
+    reader.readAsDataURL(file);
+    setTimeout(()=>{
+      setImage(data.src);
+    }, 100);
+  }
 
   return (
     <>
@@ -80,6 +113,9 @@ function Avatar({ type, image, setImage }) {
             contextMenu={isContextMenue}
             setContextMenu={setIsContextMenue}
              />
+          }
+          {
+            grabPhoto && <PhotoPicker onChange={photoPickerChange} />
           }
         </div>
       </div>
