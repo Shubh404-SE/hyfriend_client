@@ -17,7 +17,11 @@ import { SET_NEW_USER, SET_USER_INFO } from "@/context/constants";
 const gprovider = new GoogleAuthProvider();
 function login() {
   const router = useRouter();
-  const [{}, dispatch] = useStateProvider();
+  const [{userInfo, newUser}, dispatch] = useStateProvider();
+
+  useEffect(()=>{
+    if(userInfo?.id && !newUser) router.push('/');
+  }, [userInfo, newUser]);
 
   const signinWithGoogle = async () => {
     try {
@@ -42,6 +46,20 @@ function login() {
           })
           router.push('/onboarding');
         }
+        else{
+          const {id, name, email, profilePicture: profileImage, status} = data;
+          dispatch({
+            type: SET_USER_INFO,
+            userInfo: {
+              name,
+              email,
+              profileImage,
+              status,
+            }
+          })
+          router.push('/');
+        }
+
       }
     } catch (error) {
       console.log(error);
