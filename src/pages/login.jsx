@@ -20,8 +20,9 @@ function login() {
   const [{userInfo, newUser}, dispatch] = useStateProvider();
 
   useEffect(()=>{
+    console.log(userInfo, newUser);
     if(userInfo?.id && !newUser) router.push('/');
-  }, [userInfo, newUser]);
+  }, [userInfo, newUser, router]);
 
   const signinWithGoogle = async () => {
     try {
@@ -47,10 +48,11 @@ function login() {
           router.push('/onboarding');
         }
         else{
-          const {id, name, email, profilePicture: profileImage, status} = data;
+          const {id, name, email, profilePicture: profileImage, status} = data.data; 
           dispatch({
             type: SET_USER_INFO,
             userInfo: {
+              id,
               name,
               email,
               profileImage,

@@ -44,7 +44,7 @@ function onboarding() {
           dispatch({
             type: SET_USER_INFO,
             userInfo: {
-              id:data.id,
+              id:data.data.id,   
               name,
               email,
               profileImage:imgUrl,
