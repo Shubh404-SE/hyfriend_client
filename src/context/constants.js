@@ -1,3 +1,4 @@
 export const SET_USER_INFO = "SET_USER_INFO";
 export const SET_NEW_USER = "SET_NEW_USER";
+export const SET_ALL_CONTACTS_PAGE = "SET_ALL_CONTACTS_PAGE";
 
