@@ -1,9 +1,10 @@
-import { SET_ALL_CONTACTS_PAGE, SET_NEW_USER, SET_USER_INFO } from "./constants";
+import { CHANGE_CURRENT_CHAT_USER, SET_ALL_CONTACTS_PAGE, SET_NEW_USER, SET_USER_INFO } from "./constants";
 
 export const initialState = {
     userInfo: undefined,
     newUser: false,
     contactsPage:false,
+    currentChatUser: undefined,
 }
 
 const reducer = (state, action)=>{
@@ -23,6 +24,12 @@ const reducer = (state, action)=>{
                 ...state,
                 contactsPage:!state.contactsPage,
             };
+        case CHANGE_CURRENT_CHAT_USER:
+            return{
+                ...state,
+                currentChatUser: action.user
+            }
+
         default:
             return state;
     }
