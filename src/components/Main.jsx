@@ -7,7 +7,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
 import axios from "axios";
 import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
-import { SET_MESSAGES, SET_USER_INFO } from "@/context/constants";
+import { ADD_MESSAGE, SET_MESSAGES, SET_SOCKET, SET_USER_INFO } from "@/context/constants";
 import Chat from "./Chat/Chat";
 import { io } from "socket.io-client";
 
@@ -16,6 +16,9 @@ function Main() {
   const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
   const socket = useRef();
   const [redirectLogin, setRedirectLogin] = useState(false);
+  const [socketEvent, setSocketEvent] = useState(false);
+
+
 
   // check login user in realtime.
   onAuthStateChanged(firebaseAuth, async (currentUser) => {
@@ -56,8 +59,26 @@ function Main() {
     if(userInfo){
       socket.current = io(HOST);
       socket.current.emit("add-user", userInfo.id) ;
+      dispatch({
+        type:SET_SOCKET,
+        socket,
+      })
     }
   }, [userInfo]);
+
+  useEffect(()=>{
+    if(socket.current && !socketEvent){
+      socket.current.on("msg-recieve", (data)=>{
+        dispatch({
+          type:ADD_MESSAGE,
+          newMessage:{
+            ...data.messages,
+          }
+        });
+      });
+      setSocketEvent(true);
+    }
+  }, [socket.current]);
 
   // getting messages of selected user
   useEffect(()=>{

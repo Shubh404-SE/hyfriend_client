@@ -1,4 +1,4 @@
-import { CHANGE_CURRENT_CHAT_USER, SET_ALL_CONTACTS_PAGE, SET_MESSAGES, SET_NEW_USER, SET_USER_INFO } from "./constants";
+import { ADD_MESSAGE, CHANGE_CURRENT_CHAT_USER, SET_ALL_CONTACTS_PAGE, SET_MESSAGES, SET_NEW_USER, SET_SOCKET, SET_USER_INFO } from "./constants";
 
 export const initialState = {
     userInfo: undefined,
@@ -6,6 +6,7 @@ export const initialState = {
     contactsPage:false,
     currentChatUser: undefined,
     messages:[],
+    socket : undefined,
 }
 
 const reducer = (state, action)=>{
@@ -34,6 +35,16 @@ const reducer = (state, action)=>{
             return{
                 ...state,
                 messages:action.messages,
+            }
+        case SET_SOCKET:
+            return{
+                ...state,
+                socket:action.socket,
+            }
+        case ADD_MESSAGE:
+            return{
+                ...state,
+                messages:[...state.messages, action.newMessage]
             }
         default:
             return state;
