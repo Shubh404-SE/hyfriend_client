@@ -72,7 +72,7 @@ function Main() {
         dispatch({
           type:ADD_MESSAGE,
           newMessage:{
-            ...data.messages,
+            ...data.message,
           }
         });
       });

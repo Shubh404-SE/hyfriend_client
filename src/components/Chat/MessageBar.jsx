@@ -1,3 +1,4 @@
+import { ADD_MESSAGE } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
 import { ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
@@ -25,6 +26,14 @@ function MessageBar() {
         to:currentChatUser?.id,
         from:userInfo?.id,
         message:data.message,
+      });
+      
+      dispatch({
+        type:ADD_MESSAGE,
+        newMessage:{
+          ...data.message
+        },
+        fromSelf: true,
       });
       setMessage("");
     }catch(err){
