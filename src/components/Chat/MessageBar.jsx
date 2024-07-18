@@ -1,18 +1,100 @@
 import { ADD_MESSAGE } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
-import { ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
+import { ADD_IMAGE_MESSAGE_ROUTE, ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
-import React, { useState } from "react";
+import EmojiPicker from "emoji-picker-react";
+import React, { useEffect, useRef, useState } from "react";
 import { BsEmojiSmile } from "react-icons/bs";
 import { FaMicrophone } from "react-icons/fa";
 import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
+import PhotoPicker from "../common/PhotoPicker";
+import { headers } from "next/dist/client/components/headers";
 
 function MessageBar() {
 
   const [{userInfo, currentChatUser, socket}, dispatch] = useStateProvider();
   const [message, setMessage] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [grabPhoto, setGrabPhoto] = useState( false);
+  const emojiPickerRef = useRef(null);
 
+
+  // for image attachments   ------(add feature upload image only when we send it otherwise only show preview)
+  const photoPickerChange = async (e) => {
+
+    try{
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const responce = await axios.post(ADD_IMAGE_MESSAGE_ROUTE, formData, {
+        headers:{
+          "Content-Type":"multipart/form-data",
+        },
+        params:{
+          from:userInfo.id,
+          to:currentChatUser.id,
+        },
+      });
+
+      if(responce.status === 201){
+        socket.current.emit("send-msg", {
+          to:currentChatUser?.id,
+          from:userInfo?.id,
+          message:responce.data.message,
+        });
+  
+        dispatch({
+          type:ADD_MESSAGE,
+          newMessage:{
+            ...responce.data.message
+          },
+          fromSelf: true,
+        });
+      }
+    }catch(err){
+      console.log(err);
+    } 
+
+  };
+
+  useEffect(() => {
+    if (grabPhoto) {
+      const data = document.getElementById("photo-picker");
+      data.click();
+      document.body.onfocus = (e) => {
+        setTimeout(() => {
+          setGrabPhoto(false);
+        }, 1000);
+      };
+    }
+  }, [grabPhoto]);
+
+  // handle outside click for emoji picker 
+  useEffect(()=>{
+    const handleOutsideClick = (event) =>{
+      if(event.target.id !== "emoji-open"){
+        if(emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)){
+          setShowEmojiPicker(false);
+        }
+      }
+    }
+    document.addEventListener("click", handleOutsideClick);
+    return() =>{
+      document.removeEventListener("click", handleOutsideClick);
+    }
+  }, []);
+
+  const handleEmojiModel = () =>{
+    setShowEmojiPicker(!showEmojiPicker);
+  }
+  
+  const handleEmojiClick = (emoji)=>{
+    setMessage(prev =>(prev+=emoji.emoji));
+  }
+  
+  
   const sendMessage = async() =>{
     console.log(message);
     try{
@@ -27,7 +109,7 @@ function MessageBar() {
         from:userInfo?.id,
         message:data.message,
       });
-      
+
       dispatch({
         type:ADD_MESSAGE,
         newMessage:{
@@ -47,10 +129,18 @@ function MessageBar() {
           <BsEmojiSmile
             className=" text-panel-header-icon cursor-pointer text-xl"
             title="Emoji"
+            id="emoji-open"
+            onClick={handleEmojiModel}
           />
+          {showEmojiPicker && (
+            <div ref={emojiPickerRef} className=" absolute bottom-24 left-16 z-40">
+              <EmojiPicker onEmojiClick={handleEmojiClick} theme="dark" />
+            </div>
+          )}
           <ImAttachment
             className=" text-panel-header-icon cursor-pointer text-xl"
             title="Attach File"
+            onClick={()=>setGrabPhoto(true)}
           />
         </div>
         <div className=" w-full rounded-lg h-10 flex items-center">
@@ -69,6 +159,7 @@ function MessageBar() {
           </button>
         </div>
       </>
+      {grabPhoto && <PhotoPicker onChange={photoPickerChange} />}
     </div>
   );
 }
