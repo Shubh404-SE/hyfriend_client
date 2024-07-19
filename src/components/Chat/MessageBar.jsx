@@ -10,53 +10,51 @@ import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
 import PhotoPicker from "../common/PhotoPicker";
 import { headers } from "next/dist/client/components/headers";
+import CaptureAudio from "../common/CaptureAudio";
 
 function MessageBar() {
-
-  const [{userInfo, currentChatUser, socket}, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [grabPhoto, setGrabPhoto] = useState( false);
+  const [grabPhoto, setGrabPhoto] = useState(false);
+  const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const emojiPickerRef = useRef(null);
-
 
   // for image attachments   ------(add feature upload image only when we send it otherwise only show preview)
   const photoPickerChange = async (e) => {
-
-    try{
+    try {
       const file = e.target.files[0];
       const formData = new FormData();
       formData.append("image", file);
 
       const responce = await axios.post(ADD_IMAGE_MESSAGE_ROUTE, formData, {
-        headers:{
-          "Content-Type":"multipart/form-data",
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-        params:{
-          from:userInfo.id,
-          to:currentChatUser.id,
+        params: {
+          from: userInfo.id,
+          to: currentChatUser.id,
         },
       });
 
-      if(responce.status === 201){
+      if (responce.status === 201) {
         socket.current.emit("send-msg", {
-          to:currentChatUser?.id,
-          from:userInfo?.id,
-          message:responce.data.message,
+          to: currentChatUser?.id,
+          from: userInfo?.id,
+          message: responce.data.message,
         });
-  
+
         dispatch({
-          type:ADD_MESSAGE,
-          newMessage:{
-            ...responce.data.message
+          type: ADD_MESSAGE,
+          newMessage: {
+            ...responce.data.message,
           },
           fromSelf: true,
         });
       }
-    }catch(err){
+    } catch (err) {
       console.log(err);
-    } 
-
+    }
   };
 
   useEffect(() => {
@@ -71,57 +69,59 @@ function MessageBar() {
     }
   }, [grabPhoto]);
 
-  // handle outside click for emoji picker 
-  useEffect(()=>{
-    const handleOutsideClick = (event) =>{
-      if(event.target.id !== "emoji-open"){
-        if(emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)){
+  // handle outside click for emoji picker
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (event.target.id !== "emoji-open") {
+        if (
+          emojiPickerRef.current &&
+          !emojiPickerRef.current.contains(event.target)
+        ) {
           setShowEmojiPicker(false);
         }
       }
-    }
+    };
     document.addEventListener("click", handleOutsideClick);
-    return() =>{
+    return () => {
       document.removeEventListener("click", handleOutsideClick);
-    }
+    };
   }, []);
 
-  const handleEmojiModel = () =>{
+  const handleEmojiModel = () => {
     setShowEmojiPicker(!showEmojiPicker);
-  }
-  
-  const handleEmojiClick = (emoji)=>{
-    setMessage(prev =>(prev+=emoji.emoji));
-  }
-  
-  
-  const sendMessage = async() =>{
+  };
+
+  const handleEmojiClick = (emoji) => {
+    setMessage((prev) => (prev += emoji.emoji));
+  };
+
+  const sendMessage = async () => {
     console.log(message);
-    try{
-      const {data} = await axios.post(ADD_MESSAGE_ROUTE, {
-        to:currentChatUser.id,
-        from:userInfo.id,
+    try {
+      const { data } = await axios.post(ADD_MESSAGE_ROUTE, {
+        to: currentChatUser.id,
+        from: userInfo.id,
         message,
       });
       console.log(socket, currentChatUser, userInfo);
       socket.current.emit("send-msg", {
-        to:currentChatUser?.id,
-        from:userInfo?.id,
-        message:data.message,
+        to: currentChatUser?.id,
+        from: userInfo?.id,
+        message: data.message,
       });
 
       dispatch({
-        type:ADD_MESSAGE,
-        newMessage:{
-          ...data.message
+        type: ADD_MESSAGE,
+        newMessage: {
+          ...data.message,
         },
         fromSelf: true,
       });
       setMessage("");
-    }catch(err){
+    } catch (err) {
       console.log(err);
     }
-  }
+  };
   return (
     <div className=" bg-panel-header-background h-20 px-4 flex items-center gap-6 relative">
       <>
@@ -133,33 +133,48 @@ function MessageBar() {
             onClick={handleEmojiModel}
           />
           {showEmojiPicker && (
-            <div ref={emojiPickerRef} className=" absolute bottom-24 left-16 z-40">
+            <div
+              ref={emojiPickerRef}
+              className=" absolute bottom-24 left-16 z-40"
+            >
               <EmojiPicker onEmojiClick={handleEmojiClick} theme="dark" />
             </div>
           )}
           <ImAttachment
             className=" text-panel-header-icon cursor-pointer text-xl"
             title="Attach File"
-            onClick={()=>setGrabPhoto(true)}
+            onClick={() => setGrabPhoto(true)}
           />
         </div>
         <div className=" w-full rounded-lg h-10 flex items-center">
           <input
             type="text"
             placeholder="Type a message"
-            onChange={e=>setMessage(e.target.value)}
+            onChange={(e) => setMessage(e.target.value)}
             value={message}
             className=" bg-input-background text-sm focus:outline-none text-white h-10 rounded-lg px-5 py-4 w-full"
           />
         </div>
         <div className="flex w-10 items-center justify-center">
           <button className="flex">
-            <MdSend className=" text-panel-header-icon cursor-pointer text-xl" title="Send message" onClick={sendMessage} />
-            {/* <FaMicrophone className=" text-panel-header-icon cursor-pointer text-xl" title="Record"  /> */}
+            {message.length ? (
+              <MdSend
+                className=" text-panel-header-icon cursor-pointer text-xl"
+                title="Send message"
+                onClick={sendMessage}
+              />
+            ) : (
+              <FaMicrophone
+                className=" text-panel-header-icon cursor-pointer text-xl"
+                title="Record"
+                onClick={()=>setShowAudioRecorder(true)}
+              />
+            )}
           </button>
         </div>
       </>
       {grabPhoto && <PhotoPicker onChange={photoPickerChange} />}
+      {showAudioRecorder && <CaptureAudio onChange={setShowAudioRecorder} />}
     </div>
   );
 }
