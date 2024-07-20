@@ -10,7 +10,7 @@ import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
 import PhotoPicker from "../common/PhotoPicker";
 import dynamic from "next/dynamic";
-const CaptureAudio = dynamic(()=>import("../common/CaptureAudio"));
+const CaptureAudio = dynamic(()=>import("../common/CaptureAudio"), {ssr:false});
 
 function MessageBar() {
   const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
@@ -103,7 +103,6 @@ function MessageBar() {
         from: userInfo.id,
         message,
       });
-      console.log(socket, currentChatUser, userInfo);
       socket.current.emit("send-msg", {
         to: currentChatUser?.id,
         from: userInfo?.id,

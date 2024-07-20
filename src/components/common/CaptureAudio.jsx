@@ -1,4 +1,7 @@
+import { ADD_MESSAGE } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
+import { ADD_AUDIO_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
+import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import {
   FaMicrophone,
@@ -12,7 +15,7 @@ import WaveSurfer from "wavesurfer.js";
 // import { MediaRecorder } from "zego-express-engine-webrtc/sdk/src/common/zego.entity";
 
 function CaptureAudio({ hide }) {
-  const [{ useInfo, currentChatUser, socket }, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
 
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -69,6 +72,44 @@ function CaptureAudio({ hide }) {
     if(waveForm) handleStartRecording();
   }, [waveForm]);
 
+
+  const sendRecording = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("audio", renderedAudio);
+
+      const responce = await axios.post(ADD_AUDIO_MESSAGE_ROUTE, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        params: {
+          from: userInfo.id,
+          to: currentChatUser.id,
+        },
+      });
+
+      if (responce.status === 201) {
+        socket.current.emit("send-msg", {
+          to: currentChatUser?.id,
+          from: userInfo?.id,
+          message: responce.data.message,
+        });
+
+        dispatch({
+          type: ADD_MESSAGE,
+          newMessage: {
+            ...responce.data.message,
+          },
+          fromSelf: true,
+        });
+        setRenderedAudio(null)
+      }
+    }catch (err) {
+      console.log(err);
+    }
+  };
+
+
   
   const handleStartRecording = () => {
 
@@ -76,6 +117,7 @@ function CaptureAudio({ hide }) {
     setCurrentPlaybackTime(0);
     setRecordingDuration(0);
     setIsRecording(true);
+    setRecordedAudio(null);
     navigator.mediaDevices.getUserMedia({audio:true}).then((stream)=>{
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
@@ -145,8 +187,6 @@ function CaptureAudio({ hide }) {
     recordedAudio.pause();
     setIsPlaying(false);
   };
-
-  const sendRecording = async () => {};
 
   const formatTime = (time) => {
     if (isNaN(time)) return "00:00";
