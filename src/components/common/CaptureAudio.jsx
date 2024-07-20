@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa";
 import { MdSend } from "react-icons/md";
 import WaveSurfer from "wavesurfer.js";
-// import { MediaRecorder } from "zego-express-engine-webrtc/sdk/src/common/zego.entity";
+// import { MediaRecorder } from "zego-express-engine-webrtc/sdk/src/common/zego.entity"; --- giving error
 
 function CaptureAudio({ hide }) {
   const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
@@ -31,21 +31,16 @@ function CaptureAudio({ hide }) {
   const waveFormRef = useRef(null);
   const mediaRecorderRef = useRef(null);
 
-  useEffect(()=>{
-    let interval ;
-    if(isPlaying){
-      interval = setInterval(()=>{
-        setRecordingDuration((prev) =>{
-          setTotalDuration(prev+1);
-          return prev+1;
-        });
+  useEffect(() => {
+    let interval;
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingDuration((prev) => prev + 1); // Update every millisecond
       }, 1000);
     }
 
-    return ()=>{
-      clearInterval(interval);
-    }
-  }, [isPlaying]);
+    return () => clearInterval(interval);
+  }, [isRecording]);
 
   useEffect(() => {
     const wavesurfer = WaveSurfer.create({
@@ -77,7 +72,7 @@ function CaptureAudio({ hide }) {
     try {
       const formData = new FormData();
       formData.append("audio", renderedAudio);
-
+      console.log(renderedAudio);
       const responce = await axios.post(ADD_AUDIO_MESSAGE_ROUTE, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -102,7 +97,7 @@ function CaptureAudio({ hide }) {
           },
           fromSelf: true,
         });
-        setRenderedAudio(null)
+        hide(false);
       }
     }catch (err) {
       console.log(err);
@@ -110,7 +105,7 @@ function CaptureAudio({ hide }) {
   };
 
 
-  
+
   const handleStartRecording = () => {
 
     setTotalDuration(0);
@@ -118,47 +113,39 @@ function CaptureAudio({ hide }) {
     setRecordingDuration(0);
     setIsRecording(true);
     setRecordedAudio(null);
-    navigator.mediaDevices.getUserMedia({audio:true}).then((stream)=>{
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioRef.current.srcObject = stream;
-
-
+  
       const chunks = [];
-      mediaRecorder.ondataavailable = (e) =>chunks.push(e.data);
-      mediaRecorder.onstop = () =>{
-        const blob = new Blob(chunks, {type:"audio/ogg; codecs=opus"});
+      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
         const audioURL = URL.createObjectURL(blob);
         const audio = new Audio(audioURL);
         setRecordedAudio(audio);
-
+  
         waveForm.load(audioURL);
+  
+        const audioFile = new File([blob], "recording.ogg", { type: blob.type });
+        setRenderedAudio(audioFile);
       };
-
+  
       mediaRecorder.start();
-    }).catch(err=>{
+    }).catch(err => {
       console.log("Error accessing microphone", err);
-    })
+    });
   };
   
   const handleStopRecording = () => {
-    if(mediaRecorderRef.current && isRecording){
+    if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       waveForm.stop();
-
-      const audioChunks = [];
-      mediaRecorderRef.current.addEventListener("dataavilable", (event)=>{
-        audioChunks.push(event.data);
-      });
-      
-      mediaRecorderRef.current.addEventListener("stop", ()=>{
-        const audioBlob = new Blob(audioChunks, {type:"audio/mp3"});
-        const audioFile = new File([audioBlob], "recording.mp3");
-        setRenderedAudio(audioFile);
-      });
     }
   };
+  
 
   useEffect(()=>{
     if(recordedAudio){
