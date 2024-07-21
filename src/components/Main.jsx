@@ -7,18 +7,23 @@ import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
 import axios from "axios";
 import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
-import { ADD_MESSAGE, SET_MESSAGES, SET_SOCKET, SET_USER_INFO } from "@/context/constants";
+import {
+  ADD_MESSAGE,
+  SET_MESSAGES,
+  SET_SOCKET,
+  SET_USER_INFO,
+} from "@/context/constants";
 import Chat from "./Chat/Chat";
 import { io } from "socket.io-client";
+import SearchMessages from "./Chat/SearchMessages";
 
 function Main() {
   const router = useRouter();
-  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser, messagesSearch }, dispatch] =
+    useStateProvider();
   const socket = useRef();
   const [redirectLogin, setRedirectLogin] = useState(false);
   const [socketEvent, setSocketEvent] = useState(false);
-
-
 
   // check login user in realtime.
   onAuthStateChanged(firebaseAuth, async (currentUser) => {
@@ -55,25 +60,25 @@ function Main() {
   });
 
   // connecting to socket
-  useEffect(()=>{
-    if(userInfo){
+  useEffect(() => {
+    if (userInfo) {
       socket.current = io(HOST);
-      socket.current.emit("add-user", userInfo.id) ;
+      socket.current.emit("add-user", userInfo.id);
       dispatch({
-        type:SET_SOCKET,
+        type: SET_SOCKET,
         socket,
-      })
+      });
     }
   }, [userInfo]);
 
-  useEffect(()=>{
-    if(socket.current && !socketEvent){
-      socket.current.on("msg-recieve", (data)=>{
+  useEffect(() => {
+    if (socket.current && !socketEvent) {
+      socket.current.on("msg-recieve", (data) => {
         dispatch({
-          type:ADD_MESSAGE,
-          newMessage:{
+          type: ADD_MESSAGE,
+          newMessage: {
             ...data.message,
-          }
+          },
         });
       });
       setSocketEvent(true);
@@ -81,17 +86,21 @@ function Main() {
   }, [socket.current]);
 
   // getting messages of selected user
-  useEffect(()=>{
-    const getMessages = async()=>{
+  useEffect(() => {
+    const getMessages = async () => {
       // console.log(userInfo.id, currentChatUser.id);
-      const {data:{messages}} = await axios.get(`${GET_MESSAGES_ROUTE}/${userInfo.id}/${currentChatUser.id}`);
+      const {
+        data: { messages },
+      } = await axios.get(
+        `${GET_MESSAGES_ROUTE}/${userInfo.id}/${currentChatUser.id}`
+      );
 
       dispatch({
-        type:SET_MESSAGES,
+        type: SET_MESSAGES,
         messages,
-      })
-    }
-    if(currentChatUser?.id){
+      });
+    };
+    if (currentChatUser?.id) {
       getMessages();
     }
   }, [currentChatUser]);
@@ -100,7 +109,16 @@ function Main() {
     <>
       <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full overflow-hidden">
         <ChatList />
-        {currentChatUser ? <Chat /> : <Empty />}
+        {currentChatUser ? (
+          <div className={`${messagesSearch? "grid grid-cols-2":"grid-cols-2"}`}>
+            <Chat />
+            {
+              messagesSearch && <SearchMessages  />
+            }
+          </div>
+        ) : (
+          <Empty />
+        )}
       </div>
     </>
   );
