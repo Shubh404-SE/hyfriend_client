@@ -7,6 +7,19 @@ function ChatLIstItem({data, isContactPage}) {
   const [{userInfo, currentChatUser}, dispatch] = useStateProvider();
   const handleContactClick = ()=>{
     // if(currentChatUser?.id === data.id){
+    if(!isContactPage){
+      dispatch({
+        type:CHANGE_CURRENT_CHAT_USER,
+        user:{
+          name: data.name,
+          about: data.about,
+          profilePicture: data.profilePicture,
+          email: data.email,
+          id: userInfo.id === data.senderId ? data.recieverId : data.senderId,
+        },
+      })
+    }
+    else{
       dispatch({
         type: CHANGE_CURRENT_CHAT_USER,
         user:{...data}
@@ -14,6 +27,7 @@ function ChatLIstItem({data, isContactPage}) {
       dispatch({
         type:SET_ALL_CONTACTS_PAGE
       });
+    }
     // }
   }
 

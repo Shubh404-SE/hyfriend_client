@@ -6,4 +6,6 @@ export const SET_MESSAGES = "SET_MESSAGES";
 export const SET_SOCKET = "SET_SOCKET";
 export const ADD_MESSAGE = "ADD_MESSAGE";
 export const SET_MESSAGE_SEARCH = "SET_MESSAGE_SEARCH";
+export const SET_USER_CONTACTS = "SET_USER_CONTACTS";
+export const SET_ONLINE_USERS = "SET_ONLINE_USERS";
 
