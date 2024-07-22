@@ -4,6 +4,7 @@ import {
   END_CALL,
   SET_ALL_CONTACTS_PAGE,
   SET_CONTACT_SEARCH,
+  SET_EXIT_CHAT,
   SET_INCOMING_VIDEO_CALL,
   SET_INCOMING_VOICE_CALL,
   SET_MESSAGE_SEARCH,
@@ -117,13 +118,18 @@ const reducer = (state, action) => {
         incomingVideoCall: action.incomingVideoCall,
       };
     case END_CALL:
-        return{
-            ...state,
-            voiceCall:undefined,
-            videoCall:undefined,
-            incomingVideoCall:undefined,
-            incomingVoiceCall:undefined,
-        }
+      return {
+        ...state,
+        voiceCall: undefined,
+        videoCall: undefined,
+        incomingVideoCall: undefined,
+        incomingVoiceCall: undefined,
+      };
+    case SET_EXIT_CHAT:
+      return{
+        ...state,
+        currentChatUser:undefined,
+      }
     default:
       return state;
   }

@@ -13,6 +13,7 @@ import {
   SET_INCOMING_VIDEO_CALL,
   SET_INCOMING_VOICE_CALL,
   SET_MESSAGES,
+  SET_ONLINE_USERS,
   SET_SOCKET,
   SET_USER_INFO,
 } from "@/context/constants";
@@ -123,6 +124,11 @@ function Main() {
       });
       socket.current.on("video-call-rejected", ()=>{
         dispatch({type:END_CALL,})
+      });
+
+      // online/ offline
+      socket.current.on("online-users", ({onlineUsers})=>{
+        dispatch({type:SET_ONLINE_USERS, onlineUsers,})
       });
 
       setSocketEvent(true);
