@@ -16,11 +16,23 @@ import {
 import Chat from "./Chat/Chat";
 import { io } from "socket.io-client";
 import SearchMessages from "./Chat/SearchMessages";
+import VoiceCall from "./Call/VoiceCall";
+import VideoCall from "./Call/VideoCall";
 
 function Main() {
   const router = useRouter();
-  const [{ userInfo, currentChatUser, messagesSearch }, dispatch] =
-    useStateProvider();
+  const [
+    {
+      userInfo,
+      currentChatUser,
+      messagesSearch,
+      voiceCall,
+      incomingVoiceCall,
+      videoCall,
+      incomingVideoCall,
+    },
+    dispatch,
+  ] = useStateProvider();
   const socket = useRef();
   const [redirectLogin, setRedirectLogin] = useState(false);
   const [socketEvent, setSocketEvent] = useState(false);
@@ -107,14 +119,28 @@ function Main() {
 
   return (
     <>
+    {
+      voiceCall && (
+        <div className="h-screen w-screen max-h-full overflow-hidden">
+          <VoiceCall />
+        </div>
+      )
+    }
+    {
+      videoCall && (
+        <div className="h-screen w-screen max-h-full overflow-hidden">
+          <VideoCall />
+        </div>
+      )
+    }
       <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full overflow-hidden">
         <ChatList />
         {currentChatUser ? (
-          <div className={`${messagesSearch? "grid grid-cols-2":"grid-cols-2"}`}>
+          <div
+            className={`${messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}`}
+          >
             <Chat />
-            {
-              messagesSearch && <SearchMessages  />
-            }
+            {messagesSearch && <SearchMessages />}
           </div>
         ) : (
           <Empty />
