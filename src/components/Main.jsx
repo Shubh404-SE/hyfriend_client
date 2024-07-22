@@ -9,6 +9,9 @@ import axios from "axios";
 import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import {
   ADD_MESSAGE,
+  END_CALL,
+  SET_INCOMING_VIDEO_CALL,
+  SET_INCOMING_VOICE_CALL,
   SET_MESSAGES,
   SET_SOCKET,
   SET_USER_INFO,
@@ -18,6 +21,8 @@ import { io } from "socket.io-client";
 import SearchMessages from "./Chat/SearchMessages";
 import VoiceCall from "./Call/VoiceCall";
 import VideoCall from "./Call/VideoCall";
+import IncomingVideoCall from "./common/IncomingVideoCall";
+import IncomingCall from "./common/IncomingCall";
 
 function Main() {
   const router = useRouter();
@@ -93,10 +98,32 @@ function Main() {
           },
         });
       });
+
+      socket.current.on("incoming-voice-call", ({ from, roomId, callType }) => {
+        dispatch({
+          type: SET_INCOMING_VOICE_CALL,
+          incomingVoiceCall: { ...from, roomId, callType },
+        });
+      });
+
+      socket.current.on("incoming-video-call", ({ from, roomId, callType }) => {
+        dispatch({
+          type: SET_INCOMING_VIDEO_CALL,
+          incomingVideoCall: { ...from, roomId, callType },
+        });
+      });
+
+      socket.current.on("voice-call-rejected", ()=>{
+        dispatch({type:END_CALL,})
+      });
+      socket.current.on("video-call-rejected", ()=>{
+        dispatch({type:END_CALL,})
+      });
+
       setSocketEvent(true);
     }
   }, [socket.current]);
-
+  
   // getting messages of selected user
   useEffect(() => {
     const getMessages = async () => {
@@ -119,33 +146,40 @@ function Main() {
 
   return (
     <>
+
     {
-      voiceCall && (
+      incomingVideoCall && <IncomingVideoCall />
+    }
+    {
+      incomingVoiceCall && <IncomingCall />
+    }
+      {voiceCall && (
         <div className="h-screen w-screen max-h-full overflow-hidden">
           <VoiceCall />
         </div>
-      )
-    }
-    {
-      videoCall && (
+      )}
+      {videoCall && (
         <div className="h-screen w-screen max-h-full overflow-hidden">
           <VideoCall />
         </div>
-      )
-    }
-      <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full overflow-hidden">
-        <ChatList />
-        {currentChatUser ? (
-          <div
-            className={`${messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}`}
-          >
-            <Chat />
-            {messagesSearch && <SearchMessages />}
-          </div>
-        ) : (
-          <Empty />
-        )}
-      </div>
+      )}
+      {!videoCall && !voiceCall && (
+        <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full overflow-hidden">
+          <ChatList />
+          {currentChatUser ? (
+            <div
+              className={`${
+                messagesSearch ? "grid grid-cols-2" : "grid-cols-2"
+              }`}
+            >
+              <Chat />
+              {messagesSearch && <SearchMessages />}
+            </div>
+          ) : (
+            <Empty />
+          )}
+        </div>
+      )}
     </>
   );
 }

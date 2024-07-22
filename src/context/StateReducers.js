@@ -4,6 +4,7 @@ import {
   END_CALL,
   SET_ALL_CONTACTS_PAGE,
   SET_CONTACT_SEARCH,
+  SET_INCOMING_VIDEO_CALL,
   SET_INCOMING_VOICE_CALL,
   SET_MESSAGE_SEARCH,
   SET_MESSAGES,
@@ -13,6 +14,7 @@ import {
   SET_USER_CONTACTS,
   SET_USER_INFO,
   SET_VIDEO_CALL,
+  SET_VOICE_CALL,
 } from "./constants";
 
 export const initialState = {
@@ -109,7 +111,7 @@ const reducer = (state, action) => {
         ...state,
         incomingVoiceCall: action.incomingVoiceCall,
       };
-    case SET_INCOMING_VOICE_CALL:
+    case SET_INCOMING_VIDEO_CALL:
       return {
         ...state,
         incomingVideoCall: action.incomingVideoCall,
