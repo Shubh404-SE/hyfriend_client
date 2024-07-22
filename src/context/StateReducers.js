@@ -1,4 +1,4 @@
-import { ADD_MESSAGE, CHANGE_CURRENT_CHAT_USER, SET_ALL_CONTACTS_PAGE, SET_MESSAGE_SEARCH, SET_MESSAGES, SET_NEW_USER, SET_ONLINE_USERS, SET_SOCKET, SET_USER_CONTACTS, SET_USER_INFO } from "./constants";
+import { ADD_MESSAGE, CHANGE_CURRENT_CHAT_USER, SET_ALL_CONTACTS_PAGE, SET_CONTACT_SEARCH, SET_MESSAGE_SEARCH, SET_MESSAGES, SET_NEW_USER, SET_ONLINE_USERS, SET_SOCKET, SET_USER_CONTACTS, SET_USER_INFO } from "./constants";
 
 export const initialState = {
     userInfo: undefined,
@@ -10,6 +10,7 @@ export const initialState = {
     messagesSearch:false, 
     userContacts:[],
     onlineUsers:[],
+    filteredContacts:[],
 }
 
 const reducer = (state, action)=>{
@@ -63,6 +64,16 @@ const reducer = (state, action)=>{
             return{
                 ...state,
                 onlineUsers: action.onlineUsers,
+            }
+        case SET_CONTACT_SEARCH:{
+                const filteredContacts = state.userContacts.filter((contact)=>
+                    contact.name.toLowerCase().includes(action.contactSearch.toLowerCase())
+                );
+                return{
+                    ...state,
+                    filteredContacts,
+                    contactSearch:action.contactSearch,
+                }
             }
         default:
             return state;

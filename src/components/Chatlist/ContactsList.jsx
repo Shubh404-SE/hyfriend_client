@@ -1,7 +1,7 @@
 import { SET_ALL_CONTACTS_PAGE } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
 import { GET_ALL_CONTACTS } from "@/utils/ApiRoutes";
-import axios from "axios";
+import axios, { all } from "axios";
 import React, { useEffect, useState } from "react";
 import { BiArrowBack, BiSearch } from "react-icons/bi";
 import ChatLIstItem from "./ChatLIstItem";
@@ -9,6 +9,21 @@ import ChatLIstItem from "./ChatLIstItem";
 function ContactsList() {
   const [allContacts, setAllContacts] = useState([]);
   const [{}, dispatch] = useStateProvider();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchContacts, setSearchContacts] = useState([]);
+
+  useEffect(()=>{
+    if(searchTerm.length){
+      const filteredData = {};
+      Object.keys(allContacts).forEach((key)=>{
+        filteredData[key] = allContacts[key].filter((obj) =>obj.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()));
+      });
+      setSearchContacts(filteredData);
+    }else{
+      setSearchContacts(allContacts);
+    }
+  }, [searchTerm]);
+
   useEffect(() => {
     const getContacts = async () => {
       try {
@@ -16,6 +31,7 @@ function ContactsList() {
           data: { users },
         } = await axios.get(GET_ALL_CONTACTS);
         setAllContacts(users);
+        setSearchContacts(users);
       } catch (err) {
         console.log(err);
       }
@@ -43,16 +59,18 @@ function ContactsList() {
             <div>
               <input
                 type="text"
+                value={searchTerm}
+                onChange={(e)=>setSearchTerm(e.target.value)}
                 placeholder="Search contacts"
                 className=" bg-transparent text-sm focus:outline-none text-white w-full"
               />
             </div>
           </div>
         </div>
-        {Object.entries(allContacts).map(([initialLetter, userList]) => {
+        {Object.entries(searchContacts).map(([initialLetter, userList]) => {
           return (
             <div key={Date.now() + initialLetter}>
-              <div className=" text-teal-light pl-10 py-5">{initialLetter}</div>
+              {userList.length && <div className=" text-teal-light pl-10 py-5">{initialLetter}</div>}
               {userList.map((user, index) => {
                 return (
                   <ChatLIstItem
