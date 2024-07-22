@@ -37,8 +37,8 @@ function Main() {
       incomingVideoCall,
     },
     dispatch,
-  ] = useStateProvider();
-  const socket = useRef();
+  ] = useStateProvider(); // statereducers
+  const socket = useRef(); // to maintain socket
   const [redirectLogin, setRedirectLogin] = useState(false);
   const [socketEvent, setSocketEvent] = useState(false);
 
@@ -88,8 +88,11 @@ function Main() {
     }
   }, [userInfo]);
 
+  // sockets for messages and calling
   useEffect(() => {
     if (socket.current && !socketEvent) {
+
+      // recieving "msg-recieve" socket with data {from, to, message}
       socket.current.on("msg-recieve", (data) => {
         dispatch({
           type: ADD_MESSAGE,
@@ -99,6 +102,7 @@ function Main() {
         });
       });
 
+      // recieving socket for incoming calls 
       socket.current.on("incoming-voice-call", ({ from, roomId, callType }) => {
         dispatch({
           type: SET_INCOMING_VOICE_CALL,
@@ -113,6 +117,7 @@ function Main() {
         });
       });
 
+      // sockets for rejecting calls
       socket.current.on("voice-call-rejected", ()=>{
         dispatch({type:END_CALL,})
       });
@@ -123,7 +128,7 @@ function Main() {
       setSocketEvent(true);
     }
   }, [socket.current]);
-  
+
   // getting messages of selected user
   useEffect(() => {
     const getMessages = async () => {

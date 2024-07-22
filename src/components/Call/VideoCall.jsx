@@ -8,6 +8,7 @@ function VideoCall() {
   const [{videoCall, socket, userInfo}] = useStateProvider();
   useEffect(()=>{
     if(videoCall.type === "out-going"){
+      // emiting outgoing call socket
       socket.current.emit("outgoing-video-call", {
         to:videoCall.id,
         from:{

@@ -7,8 +7,20 @@ import { MdOutlineCall } from "react-icons/md";
 function Container({ data }) {
   const [{ socket, userInfo }, dispatch] = useStateProvider();
   const [callAccepted, setCallAccepted] = useState(false);
-  // console.log(data);
+
+  // end call
   const endCall = () => {
+    const id = data.id;
+    if (data.callType === "voice") {
+      socket.current.emit("reject-voice-call", {
+        from: id,
+      });
+    } else {
+      socket.current.emit("reject-video-call", {
+        from: id,
+      });
+    }
+
     dispatch({
       type: END_CALL,
     });
