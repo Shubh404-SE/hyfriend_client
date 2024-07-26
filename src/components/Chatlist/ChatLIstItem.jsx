@@ -35,7 +35,6 @@ function ChatLIstItem({ data, isContactPage }) {
     }
     // }
   };
-  // console.log(data);
 
   return (
     <div

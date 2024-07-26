@@ -40,19 +40,24 @@ function Main() {
     dispatch,
   ] = useStateProvider(); // statereducers
   const socket = useRef(); // to maintain socket
-  const [redirectLogin, setRedirectLogin] = useState(false);
+  // const [redirectLogin, setRedirectLogin] = useState(false);
   const [socketEvent, setSocketEvent] = useState(false);
+
+ useEffect(()=>{
+  if(!userInfo) router.push("/login");
+ }, [userInfo]);
+
+//  const redirectLogin = ()=>{
+//   router.push("/login");
+//  }
 
   // check login user in realtime.
   onAuthStateChanged(firebaseAuth, async (currentUser) => {
-    if (!currentUser) router.push("/login");
+    // if (!currentUser) redirectLogin();
     if (!userInfo && currentUser?.email) {
       const { data } = await axios.post(CHECK_USER_ROUTE, {
         email: currentUser.email,
       });
-      if (!data.status) {
-        router.push("/login");
-      }
 
       if (data.data) {
         const {
@@ -62,7 +67,7 @@ function Main() {
           profilePicture: profileImage,
           status,
         } = data.data;
-
+        
         dispatch({
           type: SET_USER_INFO,
           userInfo: {
@@ -92,7 +97,6 @@ function Main() {
   // sockets for messages and calling
   useEffect(() => {
     if (socket.current && !socketEvent) {
-
       // recieving "msg-recieve" socket with data {from, to, message}
       socket.current.on("msg-recieve", (data) => {
         dispatch({
@@ -103,7 +107,7 @@ function Main() {
         });
       });
 
-      // recieving socket for incoming calls 
+      // recieving socket for incoming calls
       socket.current.on("incoming-voice-call", ({ from, roomId, callType }) => {
         dispatch({
           type: SET_INCOMING_VOICE_CALL,
@@ -119,16 +123,16 @@ function Main() {
       });
 
       // sockets for rejecting calls
-      socket.current.on("voice-call-rejected", ()=>{
-        dispatch({type:END_CALL,})
+      socket.current.on("voice-call-rejected", () => {
+        dispatch({ type: END_CALL });
       });
-      socket.current.on("video-call-rejected", ()=>{
-        dispatch({type:END_CALL,})
+      socket.current.on("video-call-rejected", () => {
+        dispatch({ type: END_CALL });
       });
 
       // online/ offline
-      socket.current.on("online-users", ({onlineUsers})=>{
-        dispatch({type:SET_ONLINE_USERS, onlineUsers,})
+      socket.current.on("online-users", ({ onlineUsers }) => {
+        dispatch({ type: SET_ONLINE_USERS, onlineUsers });
       });
 
       setSocketEvent(true);
@@ -157,13 +161,8 @@ function Main() {
 
   return (
     <>
-
-    {
-      incomingVideoCall && <IncomingVideoCall />
-    }
-    {
-      incomingVoiceCall && <IncomingCall />
-    }
+      {incomingVideoCall && <IncomingVideoCall />}
+      {incomingVoiceCall && <IncomingCall />}
       {voiceCall && (
         <div className="h-screen w-screen max-h-full overflow-hidden">
           <VoiceCall />
