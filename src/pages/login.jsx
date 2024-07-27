@@ -31,7 +31,11 @@ function login() {
       if(email){
         // console.log(email);
         // add query to add data in database
-        const {data} = await axios.post(CHECK_USER_ROUTE, {email});
+        const {data} = await axios.post(CHECK_USER_ROUTE, {email}, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         if(!data.status){
           dispatch({
             type: SET_NEW_USER, newUser: true,
