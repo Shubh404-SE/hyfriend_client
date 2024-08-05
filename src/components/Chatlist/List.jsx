@@ -9,6 +9,7 @@ function List() {
   const [{ userInfo, userContacts, filteredContacts }, dispatch] =
     useStateProvider();
 
+    console.log(userInfo);
   useEffect(() => {
     const getContacts = async () => {
       try {
@@ -29,7 +30,9 @@ function List() {
         console.log(err);
       }
     };
-    getContacts();
+    if (userInfo?.id) {
+      getContacts();
+    }
   }, [userInfo]);
   return (
     <div className=" bg-search-input-container-background flex-auto overflow-auto max-h-full custom-scrollbar">

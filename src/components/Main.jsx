@@ -51,9 +51,11 @@ function Main() {
 //   router.push("/login");
 //  }
 
+
   // check login user in realtime.
   onAuthStateChanged(firebaseAuth, async (currentUser) => {
     // if (!currentUser) redirectLogin();
+    console.log(currentUser);
     if (!userInfo && currentUser?.email) {
       const { data } = await axios.post(CHECK_USER_ROUTE, {
         email: currentUser.email,
