@@ -9,7 +9,7 @@ function List() {
   const [{ userInfo, userContacts, socket, filteredContacts }, dispatch] =
     useStateProvider();
 
-  useEffect(() => {
+    // get contact list...
     const getContacts = async () => {
       try {
         const {
@@ -29,11 +29,27 @@ function List() {
         console.log(err);
       }
     };
+
+  useEffect(() => {
+    
     if (userInfo?.id) {
       getContacts();
     }
-    console.log(userContacts);
-  }, [userInfo, socket.current]);
+
+     // Listen for new messages
+     if (socket?.current) {
+      socket.current.on("msg-recieve", (data) => {
+        getContacts(); // Update the contact list when a new message is received
+        console.log("recieve update");
+      });
+
+      // handle contact list update when sender send msg..........................................................
+      // socket.current.on("contactList-update", (data) => {
+      //   console.log("send messg update", data);
+      //   getContacts(); // Update the contact list when a message is sent
+      // });
+    }
+  }, [userInfo, socket?.current]);
 
   return (
     <div className=" bg-search-input-container-background flex-auto overflow-auto max-h-full custom-scrollbar">
