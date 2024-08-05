@@ -35,11 +35,9 @@ function login() {
     if (userInfo?.id && !newUser) router.push("/");
   }, [userInfo, newUser, router]);
 
+  // control when user come to login even if his user already login and he did not logout yet
 
-  onAuthStateChanged(firebaseAuth, async (currentUser) => {
-    // if (!currentUser) redirectLogin();
-    if(currentUser) router.push("/");
-  });
+  
 
 
   // create new user

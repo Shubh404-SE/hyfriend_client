@@ -6,10 +6,9 @@ import React, { useEffect } from "react";
 import ChatLIstItem from "./ChatLIstItem";
 
 function List() {
-  const [{ userInfo, userContacts, filteredContacts }, dispatch] =
+  const [{ userInfo, userContacts, socket, filteredContacts }, dispatch] =
     useStateProvider();
 
-    console.log(userInfo);
   useEffect(() => {
     const getContacts = async () => {
       try {
@@ -33,7 +32,9 @@ function List() {
     if (userInfo?.id) {
       getContacts();
     }
-  }, [userInfo]);
+    console.log(userContacts);
+  }, [userInfo, socket.current]);
+
   return (
     <div className=" bg-search-input-container-background flex-auto overflow-auto max-h-full custom-scrollbar">
       {filteredContacts && filteredContacts.length > 0
