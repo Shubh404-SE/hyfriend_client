@@ -73,14 +73,11 @@ function MessageBar() {
     setMessage((prev) => (prev += emoji.emoji));
   };
 
-  // Enter key press to send
+  // Enter key press to send text
   const onKeyUp = (e) => {
-    console.log("hello", e);
     if (e.key === "Enter") {
       if (message) {
         sendMessage();
-      } else if (photoMessage) {
-        sendPhotoMessage(photoMessage);
       }
     }
   };
@@ -224,7 +221,7 @@ function MessageBar() {
         </>
       )}
       {grabPhoto && (
-        <PhotoPicker onChange={photoPickerChange} onKeyUp={onKeyUp} />
+        <PhotoPicker onChange={photoPickerChange} />
       )}
       {showAudioRecorder && <CaptureAudio hide={setShowAudioRecorder} />}
     </div>
