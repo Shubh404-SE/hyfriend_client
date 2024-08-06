@@ -31,3 +31,5 @@ branch1 is only created to protect previous  work from conflicts.
 preview is similar to main branch nothing special
 ## auth
 login, signup and onboarding changed because firebase login method changed. 
+## features branch (created from auth)
+here i've added extra features. 
