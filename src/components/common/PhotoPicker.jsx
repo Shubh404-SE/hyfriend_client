@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from 'react-dom';
 
-function PhotoPicker({onChange}) {
+function PhotoPicker({onChange, onKeyUp}) {
 
   const component = (
-    <input type="file" hidden id="photo-picker" onChange={onChange} />
+    <input type="file" hidden id="photo-picker" onChange={onChange} onKeyUp={onKeyUp} />
   )
   return ReactDOM.createPortal(component, document.getElementById("photo-picker-element"));
 }
