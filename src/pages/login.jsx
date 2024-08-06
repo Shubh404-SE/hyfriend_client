@@ -2,28 +2,26 @@ import React, { useEffect, useState } from "react";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
 import {
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   // signInWithPopup,
 } from "firebase/auth";
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
-import {
-  CHECK_USER_ROUTE,
-  SIGNUP_USER_ROUTE,
-} from "@/utils/ApiRoutes";
+import { CHECK_USER_ROUTE, SIGNUP_USER_ROUTE } from "@/utils/ApiRoutes";
 import { useRouter } from "next/router";
 import { useStateProvider } from "@/context/StateContext";
 import { SET_NEW_USER, SET_USER_INFO } from "@/context/constants";
-
+import { toast } from "react-toastify";
+import Loader from "@/components/common/Loader";
+import ToastMessage from "@/components/common/ToastMessage";
 
 function login() {
   const router = useRouter();
   const [{ userInfo, newUser }, dispatch] = useStateProvider();
 
   const [isSignup, setIsSignup] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -37,11 +35,9 @@ function login() {
 
   // control when user come to login even if his user already login and he did not logout yet
 
-  
-
-
   // create new user
   const signupUser = async () => {
+    setIsLoading(true);
     await createUserWithEmailAndPassword(
       firebaseAuth,
       data.email,
@@ -58,6 +54,10 @@ function login() {
             name: data.name,
           });
           console.log(signupUser);
+
+          // remove loading
+          setIsLoading(false);
+
           if (signupUser.status) {
             // set it as new user
             dispatch({
@@ -75,77 +75,90 @@ function login() {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage);
-        // ..
+        setIsLoading(false);
       });
   };
 
   // login user
   const signin = async () => {
-    console.log(data);
-    await signInWithEmailAndPassword(firebaseAuth, data.email, data.password)
-      .then(async (userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        console.log(user);
-        const { data: loginUser } = await axios.post(CHECK_USER_ROUTE, {
-          email: data.email,
-        });
+    setIsLoading(true);
+    toast.promise(
+      async () => {
+        console.log(data);
+        await signInWithEmailAndPassword(
+          firebaseAuth,
+          data.email,
+          data.password
+        )
+          .then(async (userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            console.log(user);
+            const { data: loginUser } = await axios.post(CHECK_USER_ROUTE, {
+              email: data.email,
+            });
 
-        const {name, email, profilePicture} = loginUser.data;
-  
-        if (!loginUser.status) {
-          if (loginUser.data.onboard === false) {
-            // user exist but havn't done onboard
-            console.log(loginUser);
-            dispatch({
-              type: SET_USER_INFO,
-              userInfo: {
+            const { name, email, profilePicture } = loginUser.data;
+            setIsLoading(false);
+            if (!loginUser.status) {
+              if (loginUser.data.onboard === false) {
+                // user exist but havn't done onboard
+                console.log(loginUser);
+                dispatch({
+                  type: SET_USER_INFO,
+                  userInfo: {
+                    name,
+                    email,
+                    profileImage: profilePicture,
+                    status: "Active",
+                  },
+                });
+                router.push("/onboarding");
+              } else {
+                // user not exist
+                setIsSignup(true);
+              }
+            } else {
+              const {
+                id,
                 name,
                 email,
-                profileImage:profilePicture,
-                status: "Active",
-              },
-            });
-            router.push("/onboarding");
-          }
-          else{
-            // user not exist 
-            setIsSignup(true);
-          }
-        } else {
-          const {
-            id,
-            name,
-            email,
-            profilePicture: profileImage,
-            status,
-          } = loginUser.data;
-          dispatch({
-            type: SET_USER_INFO,
-            userInfo: {
-              id,
-              name,
-              email,
-              profileImage,
-              status,
-            },
-          });
-          router.push("/");
-        }
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorMessage);
-      });
+                profilePicture: profileImage,
+                status,
+              } = loginUser.data;
+              dispatch({
+                type: SET_USER_INFO,
+                userInfo: {
+                  id,
+                  name,
+                  email,
+                  profileImage,
+                  status,
+                },
+              });
+              router.push("/");
+            }
+          })
+      },
+      {
+        pending: "Loading",
+        success: "Login Successful",
+        error: "You may have entered the wrong email id",
+      },
+      {
+        autoClose: 5000,
+      }
+    );
   };
 
   return (
     <div className="bg-conversation-panel-background h-[100vh] w-full flex items-center justify-center">
+      {isLoading && <Loader />}
       <div
         className="bg-gray-100 text-gray-500 rounded-3xl shadow-xl w-full overflow-hidden m-2"
         style={{ maxWidth: "1000px" }}
       >
+        <ToastMessage />
         <div className="md:flex w-full">
           <div className="hidden md:block w-1/2 border-r-2 border-black bg-slate-800 py-10 px-10">
             <Image src="/logo.png" alt="logo img" width={400} height={400} />

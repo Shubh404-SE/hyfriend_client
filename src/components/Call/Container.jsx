@@ -41,6 +41,7 @@ function Container({ data }) {
   }, [callAccepted]);
 
   useEffect(() => {
+    // from zego documentation..
     const startCall = async () => {
       import("zego-express-engine-webrtc").then(
         async ({ ZegoExpressEngine }) => {
