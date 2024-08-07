@@ -9,10 +9,10 @@ import { calculateTime } from "@/utils/CalculateTime";
 import MessageStatus from "../common/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
 
-function ChatLIstItem({ data, isContactPage }) {
-  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
+function ChatListItem({ data, isContactPage }) {
+  const [{ userInfo, currentChatUser, isTyping }, dispatch] =
+    useStateProvider();
   const handleContactClick = () => {
-    // if(currentChatUser?.id === data.id){
     if (!isContactPage) {
       dispatch({
         type: CHANGE_CURRENT_CHAT_USER,
@@ -33,7 +33,6 @@ function ChatLIstItem({ data, isContactPage }) {
         type: SET_ALL_CONTACTS_PAGE,
       });
     }
-    // }
   };
 
   return (
@@ -41,7 +40,7 @@ function ChatLIstItem({ data, isContactPage }) {
       className={`flex cursor-pointer items-center hover:bg-background-default-hover`}
       onClick={handleContactClick}
     >
-      <div className=" min-w-fit px-5 pt-3 pb-1">
+      <div className="min-w-fit px-5 pt-3 pb-1">
         <Avatar type="lg" image={data?.profilePicture} />
       </div>
       <div className="min-h-full flex flex-col justify-center mt-3 pr-2 w-full">
@@ -63,37 +62,52 @@ function ChatLIstItem({ data, isContactPage }) {
             </div>
           )}
         </div>
-        <div className=" flex border-b border-conversation-border pb-2 pt-1 p3-2">
-          <div className=" flex justify-between w-full">
+        <div className="flex border-b border-conversation-border pb-2 pt-1 pr-2">
+          <div className="flex justify-between w-full relative">
             <span className="text-secondary line-clamp-1 text-sm">
               {isContactPage ? (
                 data?.about || "\u00A0"
               ) : (
-                <div className="flex items-center gap-1 max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[200px] xl:max-w-[300px]">
-                  {
-                    data.senderId === userInfo.id && <MessageStatus messageStatus={data.messageStatus} />
-                  }
-                  {
-                    data.type ==="text" && <span className=" truncate">{data.message}</span>
-                  }
-                  {
-                    data.type === "audio" && <span className="flex gap-1 items-center">
+                <div className="flex items-center gap-1 max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[200px] xl:max-w-[300px] relative">
+                  {data.senderId === userInfo.id && !isTyping[data.id] && (
+                    <MessageStatus messageStatus={data.messageStatus} />
+                  )}
+                  {isTyping[data.id] ? (
+                    <div className="flex items-center min-w-[5rem]">
+                      <div className="relative">
+                        <span>Typing</span>
+                        <img
+                          src="/typing.svg"
+                          alt="Typing..."
+                          className="absolute -top-1 -right-full"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    data.type === "text" && (
+                      <span className="truncate">{data.message}</span>
+                    )
+                  )}
+                  {data.type === "audio" && (
+                    <span className="flex gap-1 items-center">
                       <FaMicrophone className="text-panel-header-icon" />
                       Audio
                     </span>
-                  }
-                  {
-                    data.type === "image" && <span className="flex gap-1 items-center">
+                  )}
+                  {data.type === "image" && (
+                    <span className="flex gap-1 items-center">
                       <FaCamera className="text-panel-header-icon" />
                       Image
                     </span>
-                  }
+                  )}
                 </div>
               )}
             </span>
-            {
-              data.totalUnreadMessages > 0 && <span className="bg-icon-blue px-[5px] rounded-full text-sm">{data.totalUnreadMessages}</span>
-            }
+            {data.totalUnreadMessages > 0 && (
+              <span className="bg-icon-blue px-[5px] rounded-full text-sm">
+                {data.totalUnreadMessages}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -101,4 +115,4 @@ function ChatLIstItem({ data, isContactPage }) {
   );
 }
 
-export default ChatLIstItem;
+export default ChatListItem;
