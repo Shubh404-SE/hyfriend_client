@@ -10,7 +10,7 @@ import MessageStatus from "../common/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
 
 function ChatListItem({ data, isContactPage }) {
-  const [{ userInfo, currentChatUser, isTyping }, dispatch] =
+  const [{ userInfo, isTyping, onlineUsers }, dispatch] =
     useStateProvider();
   const handleContactClick = () => {
     if (!isContactPage) {
@@ -40,8 +40,10 @@ function ChatListItem({ data, isContactPage }) {
       className={`flex cursor-pointer items-center hover:bg-background-default-hover`}
       onClick={handleContactClick}
     >
-      <div className="min-w-fit px-5 pt-3 pb-1">
+      <div className="min-w-fit px-5 pt-3 pb-1 relative">
         <Avatar type="lg" image={data?.profilePicture} />
+       { onlineUsers.includes(data.id) &&
+        <span className="w-3 h-3 bg-green-500 absolute bottom-1 right-6 rounded-full"></span>}
       </div>
       <div className="min-h-full flex flex-col justify-center mt-3 pr-2 w-full">
         <div className="flex justify-between">
