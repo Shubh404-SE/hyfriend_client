@@ -3,18 +3,20 @@ import { calculateTime } from "@/utils/CalculateTime";
 import React, { useEffect, useRef } from "react";
 import MessageStatus from "../common/MessageStatus";
 import ImageMessage from "./ImageMessage";
+import { PhotoProvider } from "react-photo-view";
+import "react-photo-view/dist/react-photo-view.css";
 import dynamic from "next/dynamic";
-const VoiceMessage = dynamic(()=>import("./VoiceMessage"), {ssr:false});
+const VoiceMessage = dynamic(() => import("./VoiceMessage"), { ssr: false });
 
 function ChatContainer() {
   const [{ messages, currentChatUser, userInfo }] = useStateProvider();
-  const ref =  useRef();
+  const ref = useRef();
 
-  useEffect(()=>{
-    const scrollToBottom =()=>{
+  useEffect(() => {
+    const scrollToBottom = () => {
       const chatcontainer = ref.current;
       chatcontainer.scrollTop = chatcontainer.scrollHeight;
-    }
+    };
 
     setTimeout(() => {
       scrollToBottom();
@@ -22,44 +24,64 @@ function ChatContainer() {
   }, [currentChatUser, userInfo, messages]);
 
   return (
-    <div ref={ref} className="h-[80vh] w-full relative flex-grow overflow-auto custom-scrollbar">
+    <div
+      ref={ref}
+      className="h-[80vh] w-full relative flex-grow overflow-auto custom-scrollbar"
+    >
       <div className=" bg-chat-background bg-fixed h-full w-full opacity-5 fixed left-0 top-0"></div>
       <div className="mx-10 my-6 relative bottom-0 left-0  z-0">
         <div className="flex w-full">
-          <div className="flex flex-col justify-end w-full gap-1 overflow-auto">
-            {messages.map((message, index) => (
-              <div
-                key={message.id}
-                className={`flex ${
-                  message.senderId === currentChatUser.id
-                    ? "justify-start"
-                    : "justify-end"
-                }`}
-              >
-                {message.type === "text" && (
-                  <div
-                    className={`text-white px-2 py-[5px] text-sm rounded-md flex gap-2 items-end max-w-[45%] ${
-                      message.senderId === currentChatUser.id
-                        ? " bg-incoming-background"
-                        : "bg-outgoing-background"
-                    }`}
-                  >
-                    <span className=" break-all">{message.message}</span>
-                    <div className="flex gap-1 items-end">
-                      <span className=" text-bubble-meta text-[11px] pt-1 min-w-fit">{calculateTime(message.createdAt)}</span>
-                      <span>
-                        {
-                          message.senderId === userInfo.id && <MessageStatus messageStatus={message.messageStatus} />
-                        }
-                      </span>
+          <PhotoProvider
+            speed={() => 500}
+            easing={(type) =>
+              type === 2
+                ? "cubic-bezier(0.36, 0, 0.66, -0.56)"
+                : "cubic-bezier(0.34, 1.56, 0.64, 1)"
+            }
+          >
+            <div className="flex flex-col justify-end w-full gap-1 overflow-auto">
+              {messages.map((message, index) => (
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.senderId === currentChatUser.id
+                      ? "justify-start"
+                      : "justify-end"
+                  }`}
+                >
+                  {message.type === "text" && (
+                    <div
+                      className={`text-white px-2 py-[5px] text-sm rounded-md flex gap-2 items-end max-w-[45%] ${
+                        message.senderId === currentChatUser.id
+                          ? " bg-incoming-background"
+                          : "bg-outgoing-background"
+                      }`}
+                    >
+                      <span className=" break-all">{message.message}</span>
+                      <div className="flex gap-1 items-end">
+                        <span className=" text-bubble-meta text-[11px] pt-1 min-w-fit">
+                          {calculateTime(message.createdAt)}
+                        </span>
+                        <span>
+                          {message.senderId === userInfo.id && (
+                            <MessageStatus
+                              messageStatus={message.messageStatus}
+                            />
+                          )}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                )}
-                {message.type==="image" && <ImageMessage message={message} />}
-                {message.type === "audio" && <VoiceMessage message={message}  /> }
-              </div>
-            ))}
-          </div>
+                  )}
+                  {message.type === "image" && (
+                    <ImageMessage message={message} index={index} />
+                  )}
+                  {message.type === "audio" && (
+                    <VoiceMessage message={message} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </PhotoProvider>
         </div>
       </div>
     </div>
