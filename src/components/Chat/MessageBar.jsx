@@ -10,12 +10,14 @@ import { ImAttachment } from "react-icons/im";
 import { MdDeleteForever, MdSend } from "react-icons/md";
 import PhotoPicker from "../common/PhotoPicker";
 import dynamic from "next/dynamic";
+import Avatar from "../common/Avatar";
 const CaptureAudio = dynamic(() => import("../common/CaptureAudio"), {
   ssr: false,
 });
 
 function MessageBar() {
-  const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser, socket, isTyping }, dispatch] =
+    useStateProvider();
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [grabPhoto, setGrabPhoto] = useState(false);
@@ -23,13 +25,14 @@ function MessageBar() {
   const [attachmentPreview, setAttachmentPreview] = useState(null);
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const emojiPickerRef = useRef(null);
-
+  const typingTimeoutRef = useRef(null);
+  const isTypingRef = useRef(false);
 
   const photoPickerChange = (e) => {
     const file = e.target.files[0];
     setPhotoMessage(file);
     if (file) {
-      const blockurl = URL.createObjectURL(file); // by default browser url api
+      const blockurl = URL.createObjectURL(file);
       setAttachmentPreview(blockurl);
       console.log(blockurl);
     }
@@ -47,7 +50,6 @@ function MessageBar() {
     }
   }, [grabPhoto]);
 
-  // handle outside click for emoji picker
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (event.target.id !== "emoji-open") {
@@ -84,16 +86,44 @@ function MessageBar() {
   };
 
   const handleEmojiClick = (emoji) => {
-    setMessage((prev) => (prev += emoji.emoji));
+    setMessage((prev) => prev + emoji.emoji);
   };
 
-  // send image
+  const handleTyping = (e) => {
+    setMessage(e.target.value);
+
+    if (!isTypingRef.current && message) {
+      isTypingRef.current = true;
+      socket.current.emit("startTyping", {
+        to: currentChatUser.id,
+        from: userInfo.id,
+      });
+    }
+
+    clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      isTypingRef.current = false;
+      socket.current.emit("stopTyping", {
+        to: currentChatUser.id,
+        from: userInfo.id,
+      });
+    }, 3000); // 3 seconds after the last keystroke
+  };
+
+  const handleBlur = () => {
+    isTypingRef.current = false;
+    socket.current.emit("stopTyping", {
+      to: currentChatUser.id,
+      from: userInfo.id,
+    });
+  };
+
   const sendPhotoMessage = async (file) => {
     try {
       const formData = new FormData();
       formData.append("image", file);
 
-      const responce = await axios.post(ADD_IMAGE_MESSAGE_ROUTE, formData, {
+      const response = await axios.post(ADD_IMAGE_MESSAGE_ROUTE, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -103,17 +133,17 @@ function MessageBar() {
         },
       });
 
-      if (responce.status === 201) {
+      if (response.status === 201) {
         socket.current.emit("send-msg", {
           to: currentChatUser?.id,
           from: userInfo?.id,
-          message: responce.data.message,
+          message: response.data.message,
         });
 
         dispatch({
           type: ADD_MESSAGE,
           newMessage: {
-            ...responce.data.message,
+            ...response.data.message,
           },
           fromSelf: true,
         });
@@ -126,10 +156,8 @@ function MessageBar() {
     }
   };
 
-  // send message
   const sendMessage = async () => {
     if (message) {
-      console.log(message);
       try {
         const { data } = await axios.post(ADD_MESSAGE_ROUTE, {
           to: currentChatUser.id,
@@ -150,6 +178,11 @@ function MessageBar() {
           fromSelf: true,
         });
         setMessage("");
+        isTypingRef.current = false;
+        socket.current.emit("stopTyping", {
+          to: currentChatUser.id,
+          from: userInfo.id,
+        });
       } catch (err) {
         console.log(err);
       }
@@ -157,8 +190,28 @@ function MessageBar() {
       sendPhotoMessage(photoMessage);
     }
   };
+
   return (
     <div className=" bg-panel-header-background h-20 px-4 flex items-center gap-6 relative">
+      {isTyping[currentChatUser.id] && (
+        <div className="absolute bottom-16 left-2 ">
+          <div className="flex items-center justify-center w-fit">
+            <Avatar
+              type="sm"
+              image={`${
+                currentChatUser
+                  ? currentChatUser.profilePicture
+                  : "/default_avatar.png"
+              }`}
+            />
+            <img
+              src="/typing.svg"
+              alt="Typing..."
+              className="typing-indicator"
+            />
+          </div>
+        </div>
+      )}
       {attachmentPreview && (
         <div className=" absolute w-[250px] h-[250px] bottom-16 left-0 bg-panel-header-background p-2 rounded-md">
           <img src={attachmentPreview} alt="" className=" w-full h-full" />
@@ -200,7 +253,8 @@ function MessageBar() {
             <input
               type="text"
               placeholder="Type a message"
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleTyping}
+              onBlur={handleBlur}
               value={message}
               className=" bg-input-background text-sm focus:outline-none text-white h-10 rounded-lg px-5 py-4 w-full"
             />
@@ -224,9 +278,7 @@ function MessageBar() {
           </div>
         </>
       )}
-      {grabPhoto && (
-        <PhotoPicker onChange={photoPickerChange} />
-      )}
+      {grabPhoto && <PhotoPicker onChange={photoPickerChange} />}
       {showAudioRecorder && <CaptureAudio hide={setShowAudioRecorder} />}
     </div>
   );

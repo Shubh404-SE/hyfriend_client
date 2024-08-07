@@ -7,9 +7,11 @@ import {
   SET_EXIT_CHAT,
   SET_INCOMING_VIDEO_CALL,
   SET_INCOMING_VOICE_CALL,
+  SET_IS_TYPING,
   SET_MESSAGE_SEARCH,
   SET_MESSAGES,
   SET_NEW_USER,
+  SET_NOT_TYPING,
   SET_ONLINE_USERS,
   SET_SOCKET,
   SET_USER_CONTACTS,
@@ -28,6 +30,7 @@ export const initialState = {
   messagesSearch: false,
   userContacts: [],
   onlineUsers: [],
+  isTyping: {},
   filteredContacts: [],
   videoCall: undefined,
   voiceCall: undefined,
@@ -97,6 +100,18 @@ const reducer = (state, action) => {
         contactSearch: action.contactSearch,
       };
     }
+    case SET_IS_TYPING:
+      return {
+        ...state,
+        isTyping: {...state.isTyping,  [action.typing.from]: true},
+      };
+    case SET_NOT_TYPING:
+      const updatedIsTyping = { ...state.isTyping };
+      delete updatedIsTyping[action.noTyping.from];
+      return {
+        ...state,
+        isTyping: updatedIsTyping,
+      };
     case SET_VIDEO_CALL:
       return {
         ...state,
@@ -126,10 +141,10 @@ const reducer = (state, action) => {
         incomingVoiceCall: undefined,
       };
     case SET_EXIT_CHAT:
-      return{
+      return {
         ...state,
-        currentChatUser:undefined,
-      }
+        currentChatUser: undefined,
+      };
     default:
       return state;
   }

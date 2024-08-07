@@ -12,7 +12,9 @@ import {
   END_CALL,
   SET_INCOMING_VIDEO_CALL,
   SET_INCOMING_VOICE_CALL,
+  SET_IS_TYPING,
   SET_MESSAGES,
+  SET_NOT_TYPING,
   SET_ONLINE_USERS,
   SET_SOCKET,
   SET_USER_INFO,
@@ -130,6 +132,15 @@ function Main() {
       // online/ offline
       socket.current.on("online-users", ({ onlineUsers }) => {
         dispatch({ type: SET_ONLINE_USERS, onlineUsers });
+      });
+
+      // typing or not...
+      socket.current.on("typing", ({to, from})=>{
+        dispatch({ type: SET_IS_TYPING, typing:{to, from} });
+      });
+
+      socket.current.on("noTyping", ({to, from})=>{
+        dispatch({ type: SET_NOT_TYPING, noTyping:{to, from}});
       });
 
       setSocketEvent(true);

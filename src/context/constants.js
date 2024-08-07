@@ -14,6 +14,8 @@ export const SET_VOICE_CALL = "SET_VOICE_CALL";
 export const END_CALL = "ENd_CALL";
 export const SET_INCOMING_VOICE_CALL = "SET_INCOMING_VOICE_CALL";
 export const SET_INCOMING_VIDEO_CALL = "SET_INCOMING_VIDEO_CALL";
+export const SET_IS_TYPING = "IS_TYPING";
+export const SET_NOT_TYPING = "SET_NOT_TYPING";
 
 export const SET_EXIT_CHAT = "SET_EXIT_CHAT";
 
