@@ -65,21 +65,26 @@ function MessageBar() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleEnterKeyPress = (event) => {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    };
+
+    document.addEventListener("keydown", handleEnterKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleEnterKeyPress);
+    };
+  }, [message, photoMessage]);
+
   const handleEmojiModel = () => {
     setShowEmojiPicker(!showEmojiPicker);
   };
 
   const handleEmojiClick = (emoji) => {
     setMessage((prev) => (prev += emoji.emoji));
-  };
-
-  // Enter key press to send text
-  const onKeyUp = (e) => {
-    if (e.key === "Enter") {
-      if (message) {
-        sendMessage();
-      }
-    }
   };
 
   // send image
@@ -196,7 +201,6 @@ function MessageBar() {
               type="text"
               placeholder="Type a message"
               onChange={(e) => setMessage(e.target.value)}
-              onKeyUp={(e) => onKeyUp(e)}
               value={message}
               className=" bg-input-background text-sm focus:outline-none text-white h-10 rounded-lg px-5 py-4 w-full"
             />

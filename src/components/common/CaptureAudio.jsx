@@ -67,6 +67,19 @@ function CaptureAudio({ hide }) {
     if(waveForm) handleStartRecording();
   }, [waveForm]);
 
+  useEffect(() => {
+    const handleEnterKeyPress = (event) => {
+      if (event.key === "Enter") {
+        sendRecording();
+      }
+    };
+
+    document.addEventListener("keydown", handleEnterKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleEnterKeyPress);
+    };
+  }, [renderedAudio]);
 
   const sendRecording = async () => {
     try {

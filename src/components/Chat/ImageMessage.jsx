@@ -9,8 +9,6 @@ import { PhotoView } from "react-photo-view";
 function ImageMessage({ message, index }){
   const [{ currentChatUser, userInfo }] = useStateProvider();
 
-  console.log(message);
-
   return (
     <div
       className={`p-1 rounded-lg ${
