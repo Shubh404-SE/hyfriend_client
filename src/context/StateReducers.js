@@ -13,6 +13,7 @@ import {
   SET_NEW_USER,
   SET_NOT_TYPING,
   SET_ONLINE_USERS,
+  SET_PROFILE_PAGE,
   SET_SOCKET,
   SET_USER_CONTACTS,
   SET_USER_INFO,
@@ -24,6 +25,7 @@ export const initialState = {
   userInfo: undefined,
   newUser: false,
   contactsPage: false,
+  profilePage:undefined,
   currentChatUser: undefined,
   messages: [],
   socket: undefined,
@@ -55,6 +57,11 @@ const reducer = (state, action) => {
         ...state,
         contactsPage: !state.contactsPage,
       };
+    case SET_PROFILE_PAGE:
+      return{
+        ...state,
+        profilePage: action.pageType,
+      }
     case CHANGE_CURRENT_CHAT_USER:
       return {
         ...state,

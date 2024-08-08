@@ -99,13 +99,15 @@ function Main() {
         email: currentUser.email,
       });
 
+      console.log(data);
+
       if (data.data) {
         const {
           id,
           name,
           email,
           profilePicture: profileImage,
-          status,
+          about,
         } = data.data;
 
         dispatch({
@@ -115,7 +117,7 @@ function Main() {
             name,
             email,
             profileImage,
-            status,
+            status:about,
           },
         });
       }

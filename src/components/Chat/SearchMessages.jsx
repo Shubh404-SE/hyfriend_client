@@ -22,7 +22,7 @@ function SearchMessages() {
 
   return (
     <div className="border-conversation-border border-1 w-full flex flex-col z-10 max-h-screen gap-2 bg-gray-900">
-      <div className="h-16 px-4 py-5 flex gap-10 items-center bg-panel-header-background text-primary-strong">
+      <div className="h-16 px-4 py-5 flex gap-8 items-center bg-panel-header-background text-primary-strong">
         <IoClose
           className="text-xl cursor-pointer text-icon-lighter"
           onClick={() => dispatch({ type: SET_MESSAGE_SEARCH })}

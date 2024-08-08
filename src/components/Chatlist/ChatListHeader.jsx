@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import Avatar from "../common/Avatar";
 import { useStateProvider } from "@/context/StateContext";
 import { BsFillChatLeftTextFill, BsThreeDotsVertical } from "react-icons/bs";
-import { SET_ALL_CONTACTS_PAGE, SET_USER_INFO } from "@/context/constants";
+import { SET_ALL_CONTACTS_PAGE, SET_PROFILE_PAGE, SET_USER_INFO } from "@/context/constants";
 import ContextMenu from "../common/ContextMenu";
-import { signOut } from "firebase/auth";
-import { firebaseAuth } from "@/utils/FirebaseConfig";
 import { useRouter } from "next/router";
 
 function ChatListHeader() {
@@ -20,10 +18,17 @@ function ChatListHeader() {
   const showContextMenue = (e) => {
     e.preventDefault();
     setIsContextMenue(true);
-    setContextMenueCordinates({ x: e.pageX -50, y: e.pageY +26 });
+    setContextMenueCordinates({ x: e.pageX -61, y: e.pageY +40 });
   };
 
   const contextMenuOptions = [
+    {
+      name:"Profile",
+      callback: ()=>{
+        setIsContextMenue(false);
+        dispatch({type:SET_PROFILE_PAGE, pageType:"user"});
+      }
+    },
     {
       name: "Logout",
       callback: async () => {

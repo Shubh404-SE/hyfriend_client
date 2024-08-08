@@ -4,9 +4,10 @@ import SearchBar from "./SearchBar";
 import List from "./List";
 import { useStateProvider } from "@/context/StateContext";
 import ContactsList from "./ContactsList";
+import UserProfile from "../common/UserProfile";
 
 function ChatList() {
-  const [{ contactsPage }] = useStateProvider();
+  const [{ contactsPage, profilePage }] = useStateProvider();
   const [pageType, setPageType] = useState("default");
 
   useEffect(() => {
@@ -19,7 +20,7 @@ function ChatList() {
 
   return (
     <div className=" bg-panel-header-background/95 flex flex-col max-h-screen z-20">
-      {pageType === "default" && (
+      {pageType === "default" && !profilePage && (
         <>
           <ChatListHeader />
           <SearchBar />
@@ -27,6 +28,7 @@ function ChatList() {
         </>
       )}
       {pageType === "all-contacts" && <ContactsList />}
+      {profilePage === "user" && <UserProfile />}
     </div>
   );
 }

@@ -15,6 +15,9 @@ import { SET_NEW_USER, SET_USER_INFO } from "@/context/constants";
 import { toast } from "react-toastify";
 import Loader from "@/components/common/Loader";
 import ToastMessage from "@/components/common/ToastMessage";
+import { MdOutlineEmail } from "react-icons/md";
+import { RiLockPasswordLine } from "react-icons/ri";
+import { FaCircleUser } from "react-icons/fa6";
 
 function login() {
   const router = useRouter();
@@ -187,15 +190,16 @@ function login() {
               </div>
               <div className="flex -mx-3">
                 <div className="w-full px-3 mb-5">
-                  <label htmlFor="" className="text-xs font-semibold px-1">
+                  <label htmlFor="email" className="text-xs font-semibold px-1">
                     Email
                   </label>
                   <div className="flex">
                     <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      {/* <i className="mdi mdi-email-outline text-gray-400 text-lg"></i> */}
+                      <MdOutlineEmail className="mdi mdi-email-outline text-gray-400 text-lg" />
                     </div>
                     <input
                       type="email"
+                      name="email"
                       value={data?.email}
                       onChange={(e) =>
                         setData((prev) =>
@@ -210,15 +214,16 @@ function login() {
               </div>
               <div className="flex -mx-3">
                 <div className="w-full px-3 mb-12">
-                  <label htmlFor="" className="text-xs font-semibold px-1">
+                  <label htmlFor="password" className="text-xs font-semibold px-1">
                     Password
                   </label>
                   <div className="flex">
                     <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      {/* <i className="mdi mdi-lock-outline text-gray-400 text-lg"></i> */}
+                    <RiLockPasswordLine  className="mdi mdi-lock-outline text-gray-400 text-lg" />
                     </div>
                     <input
                       type="password"
+                      name="password"
                       value={data?.password}
                       onChange={(e) =>
                         setData((prev) =>
@@ -260,15 +265,16 @@ function login() {
               <div>
                 <div className="flex -mx-3">
                   <div className="w-full px-3 mb-5">
-                    <label htmlFor="" className="text-xs font-semibold px-1">
+                    <label htmlFor="name" className="text-xs font-semibold px-1">
                       Name
                     </label>
                     <div className="flex">
                       <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                        {/* <i className="mdi mdi-email-outline text-gray-400 text-lg"></i> */}
+                      <FaCircleUser className="mdi mdi-email-outline text-gray-400 text-lg" />
                       </div>
                       <input
                         type="text"
+                        name="name"
                         value={data?.name}
                         onChange={(e) =>
                           setData((prev) =>
@@ -283,15 +289,16 @@ function login() {
                 </div>
                 <div className="flex -mx-3">
                   <div className="w-full px-3 mb-5">
-                    <label htmlFor="" className="text-xs font-semibold px-1">
+                    <label htmlFor="email" className="text-xs font-semibold px-1">
                       Email
                     </label>
                     <div className="flex">
                       <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                        {/* <i className="mdi mdi-email-outline text-gray-400 text-lg"></i> */}
+                       <MdOutlineEmail className="mdi mdi-email-outline text-gray-400 text-lg" />
                       </div>
                       <input
                         type="email"
+                        name="email"
                         value={data?.email}
                         onChange={(e) =>
                           setData((prev) =>
@@ -306,15 +313,16 @@ function login() {
                 </div>
                 <div className="flex -mx-3">
                   <div className="w-full px-3 mb-12">
-                    <label htmlFor="" className="text-xs font-semibold px-1">
+                    <label htmlFor="password" className="text-xs font-semibold px-1">
                       Password
                     </label>
                     <div className="flex">
                       <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                        {/* <i className="mdi mdi-lock-outline text-gray-400 text-lg"></i> */}
+                      <RiLockPasswordLine  className="mdi mdi-lock-outline text-gray-400 text-lg" />
                       </div>
                       <input
                         type="password"
+                        name="password"
                         value={data?.password}
                         onChange={(e) =>
                           setData((prev) =>
