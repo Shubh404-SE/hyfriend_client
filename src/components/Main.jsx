@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import { useStateProvider } from "@/context/StateContext";
 import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
+import ToastMessage from "./common/ToastMessage";
+import { toast } from "react-toastify";
 import axios from "axios";
 import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import {
@@ -26,6 +28,7 @@ import VoiceCall from "./Call/VoiceCall";
 import VideoCall from "./Call/VideoCall";
 import IncomingVideoCall from "./common/IncomingVideoCall";
 import IncomingCall from "./common/IncomingCall";
+import PermissionModal from "./common/PermissionModal";
 
 function Main() {
   const router = useRouter();
@@ -42,16 +45,53 @@ function Main() {
     dispatch,
   ] = useStateProvider(); // statereducers
   const socket = useRef(); // to maintain socket
+  const currentChatUserRef = useRef(); // to check currentChatUser inside sockets.
+  const audioRef = useRef(); // notification
+  const allowSoundRef = useRef(null); // To keep track of allowSound state
   // const [redirectLogin, setRedirectLogin] = useState(false);
   const [socketEvent, setSocketEvent] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  // const [allowSound, setAllowSound] = useState(false);
+
 
  useEffect(()=>{
   if(!userInfo) router.push("/login");
  }, [userInfo]);
 
+ useEffect(() => {
+  currentChatUserRef.current = currentChatUser; // Update ref whenever currentChatUser changes
+}, [currentChatUser]);
+
+// sound play interection
+useEffect(() => {
+  const userSoundPreference = JSON.parse(localStorage.getItem("allowSound"));
+  console.log(typeof(userSoundPreference));
+  if (userSoundPreference === null) {
+    setShowPermissionModal(true);
+  } else {
+    // setAllowSound(userSoundPreference);
+    allowSoundRef.current = userSoundPreference; // Update ref
+  }
+}, [showPermissionModal]);
+
+const handleAllowSound = () => {
+  // setAllowSound(true);
+  allowSoundRef.current = true; // Update ref
+  localStorage.setItem("allowSound", JSON.stringify(true));
+  setShowPermissionModal(false);
+};
+
+console.log(allowSoundRef.current);
+
+const handleDenySound = () => {
+  // setAllowSound(false);/
+  allowSoundRef.current = false; // Update ref
+  localStorage.setItem("allowSound", JSON.stringify(false));
+  setShowPermissionModal(false);
+};
+
   // check login user in realtime.
   onAuthStateChanged(firebaseAuth, async (currentUser) => {
-
     if (!userInfo && currentUser?.email) {
       const { data } = await axios.post(CHECK_USER_ROUTE, {
         email: currentUser.email,
@@ -92,18 +132,49 @@ function Main() {
     }
   }, [userInfo]);
 
+  // play notification sound
+  const playNotificationSound = () => {
+    console.log("playing", allowSoundRef.current);
+    if (allowSoundRef.current && audioRef.current) {
+      audioRef.current.play().catch((error) => {
+        console.error("Failed to play audio:", error);
+      });
+    }
+  };
+
   // sockets for messages and calling
   useEffect(() => {
     if (socket.current && !socketEvent) {
       // recieving "msg-recieve" socket with data {from, to, message}
 
       socket.current.on("msg-recieve", (data) => {
-        dispatch({
-          type: ADD_MESSAGE,
-          newMessage: {
-            ...data.message,
-          },
-        });
+        const chatUser = currentChatUserRef.current;
+        if (chatUser?.id === data.from){
+          dispatch({
+            type: ADD_MESSAGE,
+            newMessage: {
+              ...data.message,
+            },
+          });
+        } else if(chatUser?.id !== data.from || !chatUser) {
+          // Optionally handle the case where the message is for a different user
+          toast.info(
+            <div>
+              <strong>New message from {data.from}</strong>
+              <p>{data.message.message}</p>
+            </div>,
+            {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+          playNotificationSound(); // play notification sound.
+        }
       });
 
       // recieving socket for incoming calls
@@ -169,6 +240,7 @@ function Main() {
 
   return (
     <>
+      {showPermissionModal && <PermissionModal onAllow={handleAllowSound} onDeny={handleDenySound} />}
       {incomingVideoCall && <IncomingVideoCall />}
       {incomingVoiceCall && <IncomingCall />}
       {voiceCall && (
@@ -198,6 +270,8 @@ function Main() {
           )}
         </div>
       )}
+      <audio ref={audioRef} src="/notification.mp3" preload="auto" />
+      <ToastMessage />
     </>
   );
 }
