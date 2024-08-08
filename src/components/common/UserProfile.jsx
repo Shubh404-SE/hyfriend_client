@@ -27,7 +27,7 @@ const UserProfile = () => {
       ? userInfo.profileImage
       : currentChatUser.profilePicture
   );
-  // console.log(userInfo, currentChatUser);
+  console.log(userInfo, currentChatUser);
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 

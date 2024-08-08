@@ -87,7 +87,6 @@ function login() {
     setIsLoading(true);
     toast.promise(
       async () => {
-        console.log(data);
         await signInWithEmailAndPassword(
           firebaseAuth,
           data.email,
@@ -96,7 +95,7 @@ function login() {
           .then(async (userCredential) => {
             // Signed in
             const user = userCredential.user;
-            console.log(user);
+            // console.log(user);
             const { data: loginUser } = await axios.post(CHECK_USER_ROUTE, {
               email: data.email,
             });

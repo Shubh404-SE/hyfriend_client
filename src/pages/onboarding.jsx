@@ -54,7 +54,7 @@ function onboarding() {
               name,
               email,
               profileImage:imgUrl,
-              status:about,
+              status:data.data.about,
             }
           })
           router.push('/');
