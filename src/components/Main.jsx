@@ -29,6 +29,7 @@ import VideoCall from "./Call/VideoCall";
 import IncomingVideoCall from "./common/IncomingVideoCall";
 import IncomingCall from "./common/IncomingCall";
 import PermissionModal from "./common/PermissionModal";
+import UserProfile from "./common/UserProfile";
 
 function Main() {
   const router = useRouter();
@@ -37,6 +38,7 @@ function Main() {
       userInfo,
       currentChatUser,
       messagesSearch,
+      profilePage,
       voiceCall,
       incomingVoiceCall,
       videoCall,
@@ -91,7 +93,7 @@ function Main() {
       });
     }
   };
-  
+
   // check login user in realtime.
   onAuthStateChanged(firebaseAuth, async (currentUser) => {
     if (!userInfo && currentUser?.email) {
@@ -229,7 +231,7 @@ function Main() {
       getMessages();
     }
   }, [currentChatUser]);
-
+  
   return (
     <>
       {showPermissionModal && (
@@ -253,11 +255,12 @@ function Main() {
           {currentChatUser ? (
             <div
               className={`${
-                messagesSearch ? "grid grid-cols-2" : "grid-cols-2"
+                (messagesSearch || profilePage === "chatuser" )? "grid grid-cols-2" : "grid-cols-2"
               }`}
             >
               <Chat />
               {messagesSearch && <SearchMessages />}
+              {profilePage === "chatuser" && <UserProfile />}
             </div>
           ) : (
             <Empty />

@@ -1,6 +1,5 @@
 import { useStateProvider } from "@/context/StateContext";
 import React, { useEffect, useRef, useState } from "react";
-import Input from "./Input";
 import Avatar from "./Avatar";
 import { BiArrowBack, BiMessageRoundedDots } from "react-icons/bi";
 import { FaCircleUser, FaUserLarge } from "react-icons/fa6";
@@ -27,7 +26,7 @@ const UserProfile = () => {
       ? userInfo.profileImage
       : currentChatUser.profilePicture
   );
-  console.log(userInfo, currentChatUser);
+
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -88,10 +87,10 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="w-full z-50 bg-panel-header-background">
       {isLoading && <Loader />}
-      <div className="h-22 px-4 py-3 w-full">
-        <div className="flex items-center gap-1 text-white">
+      <div className="h-[64px] px-4 py-3 w-full">
+        <div className="flex items-center gap-1 text-white ">
           <BiArrowBack
             className=" text-panel-header-icon cursor-pointer text-xl"
             onClick={backHandle}
@@ -99,8 +98,8 @@ const UserProfile = () => {
           <span className="mx-auto text-2xl">Profile</span>
         </div>
       </div>
-      <div className="flex flex-col-reverse  w-full py-3 px-2 gap-2 overflow-auto custom-scrollbar bg-search-input-container-background">
-        <div className="flex flex-col gap-2 mt-5 justify-start p-2">
+      <div className="flex flex-col-reverse justify-end h-full w-full py-3 px-2 gap-1 overflow-auto custom-scrollbar bg-search-input-container-background">
+        <div className="flex flex-col gap-2 justify-start p-2">
           <div className="flex gap-1 items-center just -mx-3">
             <MdOutlineEmail className="text-3xl text-white" />
             <div className=" flex flex-col gap-2 px-3 mb-5">
@@ -142,7 +141,7 @@ const UserProfile = () => {
                     : "border-2 border-gray-200 outline-none focus:border-indigo-800"
                 } `}
                 placeholder="John Smith"
-                disabled={!isEditProfile}
+                disabled={ profilePage ==="chatuser" ? true: !isEditProfile}
               />
             </div>
           </div>
@@ -167,12 +166,12 @@ const UserProfile = () => {
                     : "border-2 border-gray-200 outline-none focus:border-indigo-800"
                 } `}
                 placeholder="Avilable..."
-                disabled={!isEditProfile}
+                disabled={ profilePage ==="chatuser" ? true: !isEditProfile}
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-center w-full">
+          {profilePage === "user" && <div className="flex items-center justify-center w-full">
             {!isEditProfile ? (
               <button
                 className="block w-full max-w-xs mx-auto bg-teal-light hover:bg-indigo-900 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
@@ -196,10 +195,10 @@ const UserProfile = () => {
                 </button>
               </div>
             )}
-          </div>
+          </div>}
         </div>
         <div>
-          <Avatar type="xl" image={imgUrl} setImage={setImg} />
+          <Avatar type={`${profilePage === "user" ? "xl":"xll"}`} image={imgUrl} setImage={setImg} />
         </div>
       </div>
     </div>

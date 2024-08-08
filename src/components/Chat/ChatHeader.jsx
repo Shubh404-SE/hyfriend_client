@@ -8,6 +8,7 @@ import { useStateProvider } from "@/context/StateContext";
 import {
   SET_EXIT_CHAT,
   SET_MESSAGE_SEARCH,
+  SET_PROFILE_PAGE,
   SET_VIDEO_CALL,
   SET_VOICE_CALL,
 } from "@/context/constants";
@@ -62,7 +63,11 @@ function ChatHeader() {
 
   return (
     <div className=" h-16 px-4 py-3 flex justify-between items-center bg-panel-header-background z-10">
-      <div className=" flex items-center justify-center gap-6">
+      <div className=" flex items-center justify-center gap-6 cursor-pointer"
+      onClick={()=>{
+        dispatch({type:SET_PROFILE_PAGE, pageType:"chatuser"});
+      }}
+      >
         <Avatar
           type="sm"
           image={`${

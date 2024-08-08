@@ -10,7 +10,7 @@ import MessageStatus from "../common/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
 
 function ChatListItem({ data, isContactPage }) {
-  const [{ userInfo, isTyping, onlineUsers }, dispatch] =
+  const [{ userInfo, isTyping, onlineUsers, currentChatUser }, dispatch] =
     useStateProvider();
   const handleContactClick = () => {
     if (!isContactPage) {
@@ -37,7 +37,7 @@ function ChatListItem({ data, isContactPage }) {
 
   return (
     <div
-      className={`flex cursor-pointer items-center hover:bg-background-default-hover`}
+      className={`flex cursor-pointer items-center ${currentChatUser && currentChatUser.id === data.recieverId ? "bg-conversation-panel-background":""} hover:bg-background-default-hover`}
       onClick={handleContactClick}
     >
       <div className="min-w-fit px-5 pt-3 pb-1 relative">

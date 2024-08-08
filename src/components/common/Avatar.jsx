@@ -89,6 +89,11 @@ function Avatar({ type, image, setImage }) {
             <Image src={image} alt="Avatar" className=" rounded-full" fill />
           </div>
         )}
+        {type === "xll" && (
+          <div className=" relative h-60 w-60">
+            <Image src={image? image:`/default_avatar.png`} alt="Avatar" className=" rounded-full" fill />
+          </div>
+        )}
         {type === "xl" && (
           <div
             className="relative z-0 cursor-pointer"

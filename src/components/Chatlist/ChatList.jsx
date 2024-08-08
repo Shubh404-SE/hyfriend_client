@@ -17,10 +17,10 @@ function ChatList() {
       setPageType("default");
     }
   }, [contactsPage]);
-
+  
   return (
     <div className=" bg-panel-header-background/95 flex flex-col max-h-screen z-20">
-      {pageType === "default" && !profilePage && (
+      {pageType === "default" && profilePage !=="user" && (
         <>
           <ChatListHeader />
           <SearchBar />
