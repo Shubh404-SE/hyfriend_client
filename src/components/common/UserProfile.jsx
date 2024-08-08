@@ -10,7 +10,7 @@ import { ONBOARD_USER_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
 
 const UserProfile = () => {
-  const [{ userInfo, currentChatUser, profilePage }, dispatch] =
+  const [{ userInfo, currentChatUser, profilePage, onlineUsers }, dispatch] =
     useStateProvider();
   const [name, setName] = useState(
     profilePage === "user" ? userInfo.name : currentChatUser.name
@@ -30,16 +30,16 @@ const UserProfile = () => {
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-   // Use a ref to track the initial render
-   const isMounted = useRef(false);
+  // Use a ref to track the initial render
+  const isMounted = useRef(false);
 
-   useEffect(() => {
-     if (isMounted.current) {
-       setIsEditProfile(true);
-     } else {
-       isMounted.current = true;
-     }
-   }, [imgUrl]);
+  useEffect(() => {
+    if (isMounted.current) {
+      setIsEditProfile(true);
+    } else {
+      isMounted.current = true;
+    }
+  }, [imgUrl]);
 
   const editProfileHandler = async () => {
     if (validateDetailes()) {
@@ -141,7 +141,7 @@ const UserProfile = () => {
                     : "border-2 border-gray-200 outline-none focus:border-indigo-800"
                 } `}
                 placeholder="John Smith"
-                disabled={ profilePage ==="chatuser" ? true: !isEditProfile}
+                disabled={profilePage === "chatuser" ? true : !isEditProfile}
               />
             </div>
           </div>
@@ -166,39 +166,50 @@ const UserProfile = () => {
                     : "border-2 border-gray-200 outline-none focus:border-indigo-800"
                 } `}
                 placeholder="Avilable..."
-                disabled={ profilePage ==="chatuser" ? true: !isEditProfile}
+                disabled={profilePage === "chatuser" ? true : !isEditProfile}
               />
             </div>
           </div>
 
-          {profilePage === "user" && <div className="flex items-center justify-center w-full">
-            {!isEditProfile ? (
-              <button
-                className="block w-full max-w-xs mx-auto bg-teal-light hover:bg-indigo-900 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
-                onClick={() => setIsEditProfile(true)}
-              >
-                Edit Profile
-              </button>
-            ) : (
-              <div className="flex gap-2 w-full">
+          {profilePage === "user" && (
+            <div className="flex items-center justify-center w-full">
+              {!isEditProfile ? (
                 <button
                   className="block w-full max-w-xs mx-auto bg-teal-light hover:bg-indigo-900 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
-                  onClick={editProfileHandler}
+                  onClick={() => setIsEditProfile(true)}
                 >
-                  Save
+                  Edit Profile
                 </button>
-                <button
-                  className="block w-full max-w-xs mx-auto bg-teal-light hover:bg-indigo-900 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
-                  onClick={() => setIsEditProfile(false)}
-                >
-                  Discard
-                </button>
-              </div>
-            )}
-          </div>}
+              ) : (
+                <div className="flex gap-2 w-full">
+                  <button
+                    className="block w-full max-w-xs mx-auto bg-teal-light hover:bg-indigo-900 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
+                    onClick={editProfileHandler}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="block w-full max-w-xs mx-auto bg-teal-light hover:bg-indigo-900 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
+                    onClick={() => setIsEditProfile(false)}
+                  >
+                    Discard
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        <div>
-          <Avatar type={`${profilePage === "user" ? "xl":"xll"}`} image={imgUrl} setImage={setImg} />
+        <div className="flex flex-col items-center gap-2">
+          <Avatar
+            type={`${profilePage === "user" ? "xl" : "xll"}`}
+            image={imgUrl}
+            setImage={setImg}
+          />
+          {profilePage === "chatuser" && (
+            <span className="text-xl text-white">
+              {onlineUsers.includes(currentChatUser.id) ? "Online" : "Offline"}
+            </span>
+          )}
         </div>
       </div>
     </div>
