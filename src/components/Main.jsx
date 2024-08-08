@@ -53,42 +53,44 @@ function Main() {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   // const [allowSound, setAllowSound] = useState(false);
 
+  useEffect(() => {
+    if (!userInfo) router.push("/login");
+  }, [userInfo]);
 
- useEffect(()=>{
-  if(!userInfo) router.push("/login");
- }, [userInfo]);
+  useEffect(() => {
+    currentChatUserRef.current = currentChatUser; // Update ref whenever currentChatUser changes
+  }, [currentChatUser]);
 
- useEffect(() => {
-  currentChatUserRef.current = currentChatUser; // Update ref whenever currentChatUser changes
-}, [currentChatUser]);
+  // sound play interection
+  useEffect(() => {
+    const userSoundPreference = JSON.parse(localStorage.getItem("allowSound"));
+    if (userSoundPreference === null) {
+      setShowPermissionModal(true);
+    } else {
+      allowSoundRef.current = userSoundPreference; // Update ref
+    }
+  }, [showPermissionModal]);
 
-// sound play interection
-useEffect(() => {
-  const userSoundPreference = JSON.parse(localStorage.getItem("allowSound"));
-  console.log(typeof(userSoundPreference));
-  if (userSoundPreference === null) {
-    setShowPermissionModal(true);
-  } else {
-    // setAllowSound(userSoundPreference);
-    allowSoundRef.current = userSoundPreference; // Update ref
-  }
-}, [showPermissionModal]);
+  const handleAllowSound = () => {
+    allowSoundRef.current = true; // Update ref
+    localStorage.setItem("allowSound", JSON.stringify(true));
+    setShowPermissionModal(false);
+  };
 
-const handleAllowSound = () => {
-  // setAllowSound(true);
-  allowSoundRef.current = true; // Update ref
-  localStorage.setItem("allowSound", JSON.stringify(true));
-  setShowPermissionModal(false);
-};
+  const handleDenySound = () => {
+    allowSoundRef.current = false; // Update ref
+    localStorage.setItem("allowSound", JSON.stringify(false));
+    setShowPermissionModal(false);
+  };
 
-console.log(allowSoundRef.current);
-
-const handleDenySound = () => {
-  // setAllowSound(false);/
-  allowSoundRef.current = false; // Update ref
-  localStorage.setItem("allowSound", JSON.stringify(false));
-  setShowPermissionModal(false);
-};
+  // play notification sound
+  const playNotificationSound = () => {
+    if (allowSoundRef.current && audioRef.current) {
+      audioRef.current.play().catch((error) => {
+        console.error("Failed to play audio:", error);
+      });
+    }
+  };
 
   // check login user in realtime.
   onAuthStateChanged(firebaseAuth, async (currentUser) => {
@@ -105,7 +107,7 @@ const handleDenySound = () => {
           profilePicture: profileImage,
           status,
         } = data.data;
-        
+
         dispatch({
           type: SET_USER_INFO,
           userInfo: {
@@ -132,16 +134,6 @@ const handleDenySound = () => {
     }
   }, [userInfo]);
 
-  // play notification sound
-  const playNotificationSound = () => {
-    console.log("playing", allowSoundRef.current);
-    if (allowSoundRef.current && audioRef.current) {
-      audioRef.current.play().catch((error) => {
-        console.error("Failed to play audio:", error);
-      });
-    }
-  };
-
   // sockets for messages and calling
   useEffect(() => {
     if (socket.current && !socketEvent) {
@@ -149,14 +141,14 @@ const handleDenySound = () => {
 
       socket.current.on("msg-recieve", (data) => {
         const chatUser = currentChatUserRef.current;
-        if (chatUser?.id === data.from){
+        if (chatUser?.id === data.from) {
           dispatch({
             type: ADD_MESSAGE,
             newMessage: {
               ...data.message,
             },
           });
-        } else if(chatUser?.id !== data.from || !chatUser) {
+        } else if (chatUser?.id !== data.from || !chatUser) {
           // Optionally handle the case where the message is for a different user
           toast.info(
             <div>
@@ -206,12 +198,12 @@ const handleDenySound = () => {
       });
 
       // typing or not...
-      socket.current.on("typing", ({to, from})=>{
-        dispatch({ type: SET_IS_TYPING, typing:{to, from} });
+      socket.current.on("typing", ({ to, from }) => {
+        dispatch({ type: SET_IS_TYPING, typing: { to, from } });
       });
 
-      socket.current.on("noTyping", ({to, from})=>{
-        dispatch({ type: SET_NOT_TYPING, noTyping:{to, from}});
+      socket.current.on("noTyping", ({ to, from }) => {
+        dispatch({ type: SET_NOT_TYPING, noTyping: { to, from } });
       });
 
       setSocketEvent(true);
@@ -240,7 +232,9 @@ const handleDenySound = () => {
 
   return (
     <>
-      {showPermissionModal && <PermissionModal onAllow={handleAllowSound} onDeny={handleDenySound} />}
+      {showPermissionModal && (
+        <PermissionModal onAllow={handleAllowSound} onDeny={handleDenySound} />
+      )}
       {incomingVideoCall && <IncomingVideoCall />}
       {incomingVoiceCall && <IncomingCall />}
       {voiceCall && (
