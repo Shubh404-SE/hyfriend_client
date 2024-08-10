@@ -9,47 +9,60 @@ function List() {
   const [{ userInfo, userContacts, socket, filteredContacts }, dispatch] =
     useStateProvider();
 
-    // get contact list...
-    const getContacts = async () => {
-      try {
-        const {
-          data: { users, onlineUsers },
-        } = await axios.get(`${GET_INITIAL_CONTACTS_ROUTE}/${userInfo.id}`);
+  // get contact list...
+  const getContacts = async () => {
+    try {
+      const {
+        data: { users, onlineUsers },
+      } = await axios.get(`${GET_INITIAL_CONTACTS_ROUTE}/${userInfo.id}`);
 
-        dispatch({
-          type: SET_ONLINE_USERS,
-          onlineUsers,
-        });
-        dispatch({
-          type: SET_USER_CONTACTS,
-          userContacts: users,
-        });
-        // console.log(users, onlineUsers);
-      } catch (err) {
-        console.log(err);
-      }
-    };
+      dispatch({
+        type: SET_ONLINE_USERS,
+        onlineUsers,
+      });
+      dispatch({
+        type: SET_USER_CONTACTS,
+        userContacts: users,
+      });
+      // console.log(users, onlineUsers);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // useEffect(() => {
+  //   if (userInfo?.id) {
+  //     getContacts();
+  //   }
+
+  //   if (socket) {
+  //     socket.current.on("msg-recieve", (data) => {
+  //       console.log("Message received:", data);
+  //       getContacts();
+  //     });
+
+  //     socket.current.on("contactList-update", (data) => {
+  //       console.log("Contact list update received:", data);
+  //       getContacts();
+  //     });
+
+  //   }
+  // }, [socket?.current]);
 
   useEffect(() => {
-    
     if (userInfo?.id) {
       getContacts();
     }
-
-     // Listen for new messages
-     if (socket?.current) {
-      socket.current.on("msg-recieve", (data) => {
-        getContacts(); // Update the contact list when a new message is received
-        console.log("recieve update");
+    if (socket) {
+      socket.current.on("update-contact-list", () => {
+        getContacts(); // Refresh the contact list
       });
 
-      // handle contact list update when sender send msg..........................................................
-      // socket.current.on("contactList-update", (data) => {
-      //   console.log("send messg update", data);
-      //   getContacts(); // Update the contact list when a message is sent
-      // });
+      return () => {
+        socket.current.off("update-contact-list");
+      };
     }
-  }, [userInfo, socket?.current]);
+  }, [socket?.current]);
 
   return (
     <div className=" bg-search-input-container-background flex-auto overflow-auto max-h-full custom-scrollbar">
