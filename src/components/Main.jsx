@@ -196,7 +196,8 @@ function Main() {
                   chatUser?.id === from ? 0 : contact.totalUnreadMessages + 1,
               }
             : contact;
-        });
+        }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
 
         dispatch({
           type: SET_USER_CONTACTS,

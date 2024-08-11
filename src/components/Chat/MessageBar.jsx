@@ -119,7 +119,6 @@ function MessageBar() {
   };
 
   const updateContactList = (message) =>{
-    console.log(message);
     // update chat list contacts on receiving messages.
     const updatedContacts = userContacts.map((contact) => {
       return contact.id === currentChatUser.id
@@ -134,7 +133,7 @@ function MessageBar() {
             totalUnreadMessages: 0,
           }
         : contact;
-    });
+    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     dispatch({
       type: SET_USER_CONTACTS,
