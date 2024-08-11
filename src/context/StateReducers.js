@@ -19,6 +19,8 @@ import {
   SET_USER_INFO,
   SET_VIDEO_CALL,
   SET_VOICE_CALL,
+  UPDATE_USER_CONTACTS_ON_RECEIVE,
+  UPDATE_USER_CONTACTS_ON_SEND,
 } from "./constants";
 
 export const initialState = {
@@ -92,6 +94,52 @@ const reducer = (state, action) => {
         ...state,
         userContacts: action.userContacts,
       };
+    case UPDATE_USER_CONTACTS_ON_RECEIVE:{ //***************************** what if receiver is not in contact list then we have to update contact list from api */
+      const {message, from, to} = action.data; 
+      const updatedContacts = state.userContacts.map((contact) => {
+        return contact.id === from
+          ? {
+              ...contact,
+              messageId: message.id,
+              message: message.message,
+              createdAt: message.createdAt,
+              receiverId: to,
+              senderId: from,
+              totalUnreadMessages:
+                state.currentChatUser?.id === from ? 0 : contact.totalUnreadMessages + 1,
+              type:message.type,
+            }
+          : contact;
+      }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+      return{
+        ...state,
+        userContacts:updatedContacts,
+      }
+    }
+    case UPDATE_USER_CONTACTS_ON_SEND:{ //***************************** what if sent person is not in contact list then we have to update contact list from api */
+      const {message} = action.data; 
+      const updatedContacts = state.userContacts.map((contact) => {
+        return contact.id === state.currentChatUser.id
+          ? {
+              ...contact,
+              messageId: message.id,
+              message: message.message,
+              createdAt: message.createdAt,
+              receiverId: state.currentChatUser.id,
+              senderId: state.userInfo.id,
+              messageStatus: message.messageStatus,
+              totalUnreadMessages: 0,
+              type:message.type,
+            }
+          : contact;
+      }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+      return{
+        ...state,
+        userContacts:updatedContacts,
+      }
+    }
     case SET_ONLINE_USERS:
       return {
         ...state,

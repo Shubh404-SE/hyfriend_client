@@ -61,7 +61,7 @@ function ChatListItem({ data, isContactPage }) {
   return (
     <div
       className={`flex cursor-pointer items-center ${
-        currentChatUser && currentChatUser.id === data.recieverId
+        (currentChatUser && currentChatUser.id === data.id)
           ? "bg-conversation-panel-background"
           : ""
       } hover:bg-background-default-hover`}

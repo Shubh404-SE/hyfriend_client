@@ -1,4 +1,4 @@
-import { ADD_MESSAGE, SET_USER_CONTACTS } from "@/context/constants";
+import { ADD_MESSAGE, SET_USER_CONTACTS, UPDATE_USER_CONTACTS_ON_SEND } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
 import { ADD_IMAGE_MESSAGE_ROUTE, ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
@@ -118,29 +118,6 @@ function MessageBar() {
     });
   };
 
-  const updateContactList = (message) =>{
-    // update chat list contacts on receiving messages.
-    const updatedContacts = userContacts.map((contact) => {
-      return contact.id === currentChatUser.id
-        ? {
-            ...contact,
-            messageId: message.id,
-            message: message.message,
-            createdAt: message.createdAt,
-            receiverId: currentChatUser.id,
-            senderId: userInfo.id,
-            messageStatus: message.messageStatus,
-            totalUnreadMessages: 0,
-          }
-        : contact;
-    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    dispatch({
-      type: SET_USER_CONTACTS,
-      userContacts: updatedContacts,
-    });
-  }
-
   const sendPhotoMessage = async (file) => {
     try {
       const formData = new FormData();
@@ -165,14 +142,17 @@ function MessageBar() {
         });
 
         dispatch({
+          type:UPDATE_USER_CONTACTS_ON_SEND,
+          data:response.data
+        });
+
+        dispatch({
           type: ADD_MESSAGE,
           newMessage: {
             ...response.data.message,
           },
           fromSelf: true,
         });
-
-        updateContactList(response.data.message);
 
         setAttachmentPreview(null);
         setPhotoMessage(null);
@@ -197,14 +177,17 @@ function MessageBar() {
         });
 
         dispatch({
+          type:UPDATE_USER_CONTACTS_ON_SEND,
+          data: data
+        });
+
+        dispatch({
           type: ADD_MESSAGE,
           newMessage: {
             ...data.message,
           },
           fromSelf: true,
         });
-
-        updateContactList(data.message);
 
         setMessage("");
         isTypingRef.current = false;
@@ -308,7 +291,7 @@ function MessageBar() {
         </>
       )}
       {grabPhoto && <PhotoPicker onChange={photoPickerChange} />}
-      {showAudioRecorder && <CaptureAudio hide={setShowAudioRecorder} addToContactList={updateContactList}/>}
+      {showAudioRecorder && <CaptureAudio hide={setShowAudioRecorder}/>}
     </div>
   );
 }

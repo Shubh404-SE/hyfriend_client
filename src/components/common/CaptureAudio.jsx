@@ -1,4 +1,4 @@
-import { ADD_MESSAGE } from "@/context/constants";
+import { ADD_MESSAGE, UPDATE_USER_CONTACTS_ON_SEND } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
 import { ADD_AUDIO_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
@@ -14,7 +14,7 @@ import { MdSend } from "react-icons/md";
 import WaveSurfer from "wavesurfer.js";
 // import { MediaRecorder } from "zego-express-engine-webrtc/sdk/src/common/zego.entity"; --- giving error
 
-function CaptureAudio({ hide, addToContactList }) {
+function CaptureAudio({ hide }) {
   const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
 
   const [isRecording, setIsRecording] = useState(false);
@@ -103,14 +103,17 @@ function CaptureAudio({ hide, addToContactList }) {
         });
 
         dispatch({
+          type:UPDATE_USER_CONTACTS_ON_SEND,
+          data:responce.data
+        });
+
+        dispatch({
           type: ADD_MESSAGE,
           newMessage: {
             ...responce.data.message,
           },
           fromSelf: true,
         });
-
-        addToContactList(responce.data.message);
 
         hide(false);
       }

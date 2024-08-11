@@ -21,6 +21,7 @@ import {
   SET_SOCKET,
   SET_USER_CONTACTS,
   SET_USER_INFO,
+  UPDATE_USER_CONTACTS_ON_RECEIVE,
 } from "@/context/constants";
 import Chat from "./Chat/Chat";
 import { io } from "socket.io-client";
@@ -50,7 +51,6 @@ function Main() {
   ] = useStateProvider(); // statereducers
   const socket = useRef(); // to maintain socket
   const currentChatUserRef = useRef(); // to check currentChatUser inside sockets.
-  const userContactsRef = useRef(userContacts);
   const audioRef = useRef(); // notification
   const allowSoundRef = useRef(null); // To keep track of allowSound state
   // const [redirectLogin, setRedirectLogin] = useState(false);
@@ -65,10 +65,6 @@ function Main() {
   useEffect(() => {
     currentChatUserRef.current = currentChatUser; // Update ref whenever currentChatUser changes
   }, [currentChatUser]);
-
-  useEffect(() => {
-    userContactsRef.current = userContacts; // Update ref whenever usercontacts changes
-  }, [userContacts]);
 
   // sound play interection
   useEffect(() => {
@@ -180,31 +176,23 @@ function Main() {
         const { from, to, message } = data;
 
         const chatUser = currentChatUserRef.current;
-        const userContacts = userContactsRef.current; // this userContacts is diffent then useProvider's
-
-        // update chat list contacts on receiving messages.
-        const updatedContacts = userContacts.map((contact) => {
-          return contact.id === from
-            ? {
-                ...contact,
-                messageId: message.id,
-                message: message.message,
-                createdAt: message.createdAt,
-                receiverId: to,
-                senderId: from,
-                totalUnreadMessages:
-                  chatUser?.id === from ? 0 : contact.totalUnreadMessages + 1,
-              }
-            : contact;
-        }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
 
         dispatch({
-          type: SET_USER_CONTACTS,
-          userContacts: updatedContacts,
-        });
+          type:UPDATE_USER_CONTACTS_ON_RECEIVE,
+          data:{from, message, to},
+        })
 
-        if (chatUser?.id === data.from) {
+        if (chatUser?.id === data.from) { // receiver and sender are at each others chat. 
+
+          // emit socket to sender to change that message status to read.
+          /**
+           * what should we send as data to sender so that he can update that message status, 
+           * senderId -> data.from,
+           * messageId -> data.message.id
+           */
+
+
+
           dispatch({
             type: ADD_MESSAGE,
             newMessage: {
