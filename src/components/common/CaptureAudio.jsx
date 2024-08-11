@@ -14,7 +14,7 @@ import { MdSend } from "react-icons/md";
 import WaveSurfer from "wavesurfer.js";
 // import { MediaRecorder } from "zego-express-engine-webrtc/sdk/src/common/zego.entity"; --- giving error
 
-function CaptureAudio({ hide }) {
+function CaptureAudio({ hide, addToContactList }) {
   const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
 
   const [isRecording, setIsRecording] = useState(false);
@@ -109,6 +109,9 @@ function CaptureAudio({ hide }) {
           },
           fromSelf: true,
         });
+
+        addToContactList(responce.data.message);
+
         hide(false);
       }
     }catch (err) {

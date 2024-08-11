@@ -180,7 +180,7 @@ function Main() {
         const { from, to, message } = data;
 
         const chatUser = currentChatUserRef.current;
-        const userContacts = userContactsRef.current;
+        const userContacts = userContactsRef.current; // this userContacts is diffent then useProvider's
 
         // update chat list contacts on receiving messages.
         const updatedContacts = userContacts.map((contact) => {
