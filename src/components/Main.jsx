@@ -19,6 +19,7 @@ import {
   SET_NOT_TYPING,
   SET_ONLINE_USERS,
   SET_SOCKET,
+  SET_USER_CONTACTS,
   SET_USER_INFO,
 } from "@/context/constants";
 import Chat from "./Chat/Chat";
@@ -38,6 +39,7 @@ function Main() {
       userInfo,
       currentChatUser,
       messagesSearch,
+      userContacts,
       profilePage,
       voiceCall,
       incomingVoiceCall,
@@ -48,6 +50,7 @@ function Main() {
   ] = useStateProvider(); // statereducers
   const socket = useRef(); // to maintain socket
   const currentChatUserRef = useRef(); // to check currentChatUser inside sockets.
+  const userContactsRef = useRef(userContacts);
   const audioRef = useRef(); // notification
   const allowSoundRef = useRef(null); // To keep track of allowSound state
   // const [redirectLogin, setRedirectLogin] = useState(false);
@@ -62,6 +65,10 @@ function Main() {
   useEffect(() => {
     currentChatUserRef.current = currentChatUser; // Update ref whenever currentChatUser changes
   }, [currentChatUser]);
+
+  useEffect(() => {
+    userContactsRef.current = userContacts; // Update ref whenever usercontacts changes
+  }, [userContacts]);
 
   // sound play interection
   useEffect(() => {
@@ -117,17 +124,47 @@ function Main() {
             name,
             email,
             profileImage,
-            status:about,
+            status: about,
           },
         });
       }
     }
   });
 
+  // getting messages of selected user
+  useEffect(() => {
+    const getMessages = async () => {
+      // console.log(userInfo.id, currentChatUser.id);
+      const {
+        data: { messages },
+      } = await axios.get(
+        `${GET_MESSAGES_ROUTE}/${userInfo.id}/${currentChatUser.id}`
+      );
+
+      dispatch({
+        type: SET_MESSAGES,
+        messages,
+      });
+    };
+    if (currentChatUser?.id) {
+      getMessages();
+    }
+  }, [currentChatUser]);
+
   // connecting to socket
   useEffect(() => {
     if (userInfo) {
-      socket.current = io(HOST);
+      socket.current = io(
+        HOST
+        //   ,{
+        //   // chatgpt suggested
+        //   reconnection: true, // Default: true, but ensure it's enabled
+        //   reconnectionAttempts: Infinity, // Default: Infinity, try forever until connected
+        //   reconnectionDelay: 1000, // Default: 1000ms, time between reconnection attempts
+        //   reconnectionDelayMax: 5000, // Default: 5000ms, maximum delay between reconnection attempts
+        //   timeout: 20000, // Default: 20000ms, time before a connect error is emitted
+        // }
+      );
       socket.current.emit("add-user", userInfo.id);
       dispatch({
         type: SET_SOCKET,
@@ -136,13 +173,36 @@ function Main() {
     }
   }, [userInfo]);
 
-  // sockets for messages and calling
   useEffect(() => {
     if (socket.current && !socketEvent) {
       // recieving "msg-recieve" socket with data {from, to, message}
-
       socket.current.on("msg-recieve", (data) => {
+        const { from, to, message } = data;
+
         const chatUser = currentChatUserRef.current;
+        const userContacts = userContactsRef.current;
+
+        // update chat list contacts on receiving messages.
+        const updatedContacts = userContacts.map((contact) => {
+          return contact.id === from
+            ? {
+                ...contact,
+                messageId: message.id,
+                message: message.message,
+                createdAt: message.createdAt,
+                receiverId: to,
+                senderId: from,
+                totalUnreadMessages:
+                  chatUser?.id === from ? 0 : contact.totalUnreadMessages + 1,
+              }
+            : contact;
+        });
+
+        dispatch({
+          type: SET_USER_CONTACTS,
+          userContacts: updatedContacts,
+        });
+
         if (chatUser?.id === data.from) {
           dispatch({
             type: ADD_MESSAGE,
@@ -208,30 +268,54 @@ function Main() {
         dispatch({ type: SET_NOT_TYPING, noTyping: { to, from } });
       });
 
+      // these are not working properly....
+      // socket.current.on("disconnect", (reason) => {
+      //   console.log("Disconnected from server bcz", reason);
+      //   socket.current.connect();
+      //   if (userInfo) {
+      //     socket.current = io(HOST);
+      //     socket.current.emit("add-user", userInfo.id);
+      //     dispatch({
+      //       type: SET_SOCKET,
+      //       socket,
+      //     });
+      //   }
+      // });
+
+      // socket.current.on("reconnect", () => {
+      //   console.log("Reconnected to server");
+      //   if (userInfo) {
+      //     socket.current = io(HOST);
+      //     socket.current.emit("add-user", userInfo.id);
+      //     dispatch({
+      //       type: SET_SOCKET,
+      //       socket,
+      //     });
+      //   }
+      // });
+
       setSocketEvent(true);
     }
   }, [socket.current]);
 
-  // getting messages of selected user
-  useEffect(() => {
-    const getMessages = async () => {
-      // console.log(userInfo.id, currentChatUser.id);
-      const {
-        data: { messages },
-      } = await axios.get(
-        `${GET_MESSAGES_ROUTE}/${userInfo.id}/${currentChatUser.id}`
-      );
+  // disconnect when not visible tab
+  // useEffect(() => {
+  //   const handleVisibilityChange = () => {
+  //     if (document.visibilityState === "visible" && socket.current.disconnected) {
+  //       console.log("Tab became visible. Attempting to reconnect...");
+  //       socket.current.connect();
+  //     }
+  //   };
 
-      dispatch({
-        type: SET_MESSAGES,
-        messages,
-      });
-    };
-    if (currentChatUser?.id) {
-      getMessages();
-    }
-  }, [currentChatUser]);
-  
+  //   document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  //   return () => {
+  //     document.removeEventListener("visibilitychange", handleVisibilityChange);
+  //   };
+  // }, [socket.current]);
+
+  // sockets for messages and calling
+
   return (
     <>
       {showPermissionModal && (
@@ -255,7 +339,9 @@ function Main() {
           {currentChatUser ? (
             <div
               className={`${
-                (messagesSearch || profilePage === "chatuser" )? "grid grid-cols-2" : "grid-cols-2"
+                messagesSearch || profilePage === "chatuser"
+                  ? "grid grid-cols-2"
+                  : "grid-cols-2"
               }`}
             >
               <Chat />

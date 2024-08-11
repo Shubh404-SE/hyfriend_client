@@ -4,16 +4,20 @@ import { useStateProvider } from "@/context/StateContext";
 import {
   CHANGE_CURRENT_CHAT_USER,
   SET_ALL_CONTACTS_PAGE,
+  SET_USER_CONTACTS,
 } from "@/context/constants";
 import { calculateTime } from "@/utils/CalculateTime";
 import MessageStatus from "../common/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
 
 function ChatListItem({ data, isContactPage }) {
-  const [{ userInfo, isTyping, onlineUsers, currentChatUser }, dispatch] =
-    useStateProvider();
+  const [
+    { userInfo, isTyping, onlineUsers, currentChatUser, userContacts },
+    dispatch,
+  ] = useStateProvider();
   const handleContactClick = () => {
     if (!isContactPage) {
+      // Update the current chat user in state
       dispatch({
         type: CHANGE_CURRENT_CHAT_USER,
         user: {
@@ -24,6 +28,25 @@ function ChatListItem({ data, isContactPage }) {
           id: userInfo.id === data.senderId ? data.recieverId : data.senderId,
         },
       });
+
+      // Notify the server about the active chat
+      // socket.current.emit("active-chat", {
+      //   userId: userInfo.id,
+      //   contactId: currentChatUser.id,
+      // });
+
+      // Reset unread messages count
+      const updatedContacts = userContacts.map((contact) =>
+        contact.id === data.id
+          ? { ...contact, totalUnreadMessages: 0 }
+          : contact
+      );
+
+      dispatch({
+        type: SET_USER_CONTACTS,
+        userContacts: updatedContacts,
+      });
+      
     } else {
       dispatch({
         type: CHANGE_CURRENT_CHAT_USER,
@@ -37,13 +60,18 @@ function ChatListItem({ data, isContactPage }) {
 
   return (
     <div
-      className={`flex cursor-pointer items-center ${currentChatUser && currentChatUser.id === data.recieverId ? "bg-conversation-panel-background":""} hover:bg-background-default-hover`}
+      className={`flex cursor-pointer items-center ${
+        currentChatUser && currentChatUser.id === data.recieverId
+          ? "bg-conversation-panel-background"
+          : ""
+      } hover:bg-background-default-hover`}
       onClick={handleContactClick}
     >
       <div className="min-w-fit px-5 pt-3 pb-1 relative">
         <Avatar type="lg" image={data?.profilePicture} />
-       { onlineUsers.includes(data.id) &&
-        <span className="w-3 h-3 bg-green-500 absolute bottom-1 right-6 rounded-full"></span>}
+        {onlineUsers.includes(data.id) && (
+          <span className="w-3 h-3 bg-green-500 absolute bottom-1 right-6 rounded-full"></span>
+        )}
       </div>
       <div className="min-h-full flex flex-col justify-center mt-3 pr-2 w-full">
         <div className="flex justify-between">

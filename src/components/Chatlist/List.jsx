@@ -30,39 +30,11 @@ function List() {
     }
   };
 
-  // useEffect(() => {
-  //   if (userInfo?.id) {
-  //     getContacts();
-  //   }
-
-  //   if (socket) {
-  //     socket.current.on("msg-recieve", (data) => {
-  //       console.log("Message received:", data);
-  //       getContacts();
-  //     });
-
-  //     socket.current.on("contactList-update", (data) => {
-  //       console.log("Contact list update received:", data);
-  //       getContacts();
-  //     });
-
-  //   }
-  // }, [socket?.current]);
-
   useEffect(() => {
     if (userInfo?.id) {
       getContacts();
     }
-    if (socket) {
-      socket.current.on("update-contact-list", () => {
-        getContacts(); // Refresh the contact list
-      });
-
-      return () => {
-        socket.current.off("update-contact-list");
-      };
-    }
-  }, [socket?.current]);
+  }, [userInfo]);
 
   return (
     <div className=" bg-search-input-container-background flex-auto overflow-auto max-h-full custom-scrollbar">
