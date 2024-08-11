@@ -6,7 +6,7 @@ import React, { useEffect } from "react";
 import ChatLIstItem from "./ChatLIstItem";
 
 function List() {
-  const [{ userInfo, userContacts, filteredContacts }, dispatch] =
+  const [{ userInfo, userContacts, filteredContacts, refreshContacts }, dispatch] =
     useStateProvider();
 
   // get contact list...
@@ -34,7 +34,7 @@ function List() {
     if (userInfo?.id) {
       getContacts();
     }
-  }, [userInfo]);
+  }, [userInfo, refreshContacts]);
 
   return (
     <div className=" bg-search-input-container-background flex-auto overflow-auto max-h-full custom-scrollbar">

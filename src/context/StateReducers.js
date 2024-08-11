@@ -27,12 +27,13 @@ export const initialState = {
   userInfo: undefined,
   newUser: false,
   contactsPage: false,
-  profilePage:undefined,
+  profilePage: undefined,
   currentChatUser: undefined,
   messages: [],
   socket: undefined,
   messagesSearch: false,
   userContacts: [],
+  refreshContacts: true,
   onlineUsers: [],
   isTyping: {},
   filteredContacts: [],
@@ -60,10 +61,10 @@ const reducer = (state, action) => {
         contactsPage: !state.contactsPage,
       };
     case SET_PROFILE_PAGE:
-      return{
+      return {
         ...state,
         profilePage: action.pageType,
-      }
+      };
     case CHANGE_CURRENT_CHAT_USER:
       return {
         ...state,
@@ -94,11 +95,15 @@ const reducer = (state, action) => {
         ...state,
         userContacts: action.userContacts,
       };
-    case UPDATE_USER_CONTACTS_ON_RECEIVE:{ //***************************** what if receiver is not in contact list then we have to update contact list from api */
-      const {message, from, to} = action.data; 
-      const updatedContacts = state.userContacts.map((contact) => {
-        return contact.id === from
-          ? {
+    case UPDATE_USER_CONTACTS_ON_RECEIVE: {
+      //***************************** what if receiver is not in contact list then we have to update contact list from api */
+      const { message, from, to } = action.data;
+      let userFound = false;
+      const updatedContacts = state.userContacts
+        .map((contact) => {
+          if (contact.id === from) {
+            userFound = true;
+            return {
               ...contact,
               messageId: message.id,
               message: message.message,
@@ -106,22 +111,36 @@ const reducer = (state, action) => {
               receiverId: to,
               senderId: from,
               totalUnreadMessages:
-                state.currentChatUser?.id === from ? 0 : contact.totalUnreadMessages + 1,
-              type:message.type,
-            }
-          : contact;
-      }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
-      return{
-        ...state,
-        userContacts:updatedContacts,
+                state.currentChatUser?.id === from
+                  ? 0
+                  : contact.totalUnreadMessages + 1,
+              type: message.type,
+            };
+          } else return contact;
+        })
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      if (!userFound) {
+        return {
+          ...state,
+          refreshContacts: !state.refreshContacts,
+        };
       }
+
+      return {
+        ...state,
+        userContacts: updatedContacts,
+      };
     }
-    case UPDATE_USER_CONTACTS_ON_SEND:{ //***************************** what if sent person is not in contact list then we have to update contact list from api */
-      const {message} = action.data; 
-      const updatedContacts = state.userContacts.map((contact) => {
-        return contact.id === state.currentChatUser.id
-          ? {
+    case UPDATE_USER_CONTACTS_ON_SEND: {
+      //***************************** what if sent person is not in contact list then we have to update contact list from api */
+      const { message } = action.data;
+      let userFound = false;
+      const updatedContacts = state.userContacts
+        .map((contact) => {
+          if (contact.id === state.currentChatUser.id) {
+            userFound = true;
+            return {
               ...contact,
               messageId: message.id,
               message: message.message,
@@ -130,15 +149,25 @@ const reducer = (state, action) => {
               senderId: state.userInfo.id,
               messageStatus: message.messageStatus,
               totalUnreadMessages: 0,
-              type:message.type,
-            }
-          : contact;
-      }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
-      return{
-        ...state,
-        userContacts:updatedContacts,
+              type: message.type,
+            };
+          } else return contact;
+        })
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        console.log(updatedContacts);
+
+      if (!userFound) {
+        return {
+          ...state,
+          refreshContacts: !state.refreshContacts,
+        };
       }
+
+      return {
+        ...state,
+        userContacts: updatedContacts,
+      };
     }
     case SET_ONLINE_USERS:
       return {
@@ -158,7 +187,7 @@ const reducer = (state, action) => {
     case SET_IS_TYPING:
       return {
         ...state,
-        isTyping: {...state.isTyping,  [action.typing.from]: true},
+        isTyping: { ...state.isTyping, [action.typing.from]: true },
       };
     case SET_NOT_TYPING:
       const updatedIsTyping = { ...state.isTyping };
