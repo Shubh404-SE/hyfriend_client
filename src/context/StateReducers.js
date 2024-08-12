@@ -108,7 +108,7 @@ const reducer = (state, action) => {
               messageId: message.id,
               message: message.message,
               createdAt: message.createdAt,
-              receiverId: to,
+              recieverId: to,
               senderId: from,
               totalUnreadMessages:
                 state.currentChatUser?.id === from
@@ -145,7 +145,7 @@ const reducer = (state, action) => {
               messageId: message.id,
               message: message.message,
               createdAt: message.createdAt,
-              receiverId: state.currentChatUser.id,
+              recieverId: state.currentChatUser.id,
               senderId: state.userInfo.id,
               messageStatus: message.messageStatus,
               totalUnreadMessages: 0,
@@ -154,8 +154,6 @@ const reducer = (state, action) => {
           } else return contact;
         })
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-        console.log(updatedContacts);
 
       if (!userFound) {
         return {
