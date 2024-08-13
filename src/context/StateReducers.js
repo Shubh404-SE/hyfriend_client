@@ -2,6 +2,7 @@ import {
   ADD_MESSAGE,
   CHANGE_CURRENT_CHAT_USER,
   END_CALL,
+  IS_ON_SAME_CHAT,
   SET_ALL_CONTACTS_PAGE,
   SET_CONTACT_SEARCH,
   SET_EXIT_CHAT,
@@ -19,6 +20,7 @@ import {
   SET_USER_INFO,
   SET_VIDEO_CALL,
   SET_VOICE_CALL,
+  UPDATE_MESSAGE_STATUS,
   UPDATE_USER_CONTACTS_ON_RECEIVE,
   UPDATE_USER_CONTACTS_ON_SEND,
 } from "./constants";
@@ -29,6 +31,7 @@ export const initialState = {
   contactsPage: false,
   profilePage: undefined,
   currentChatUser: undefined,
+  isOnSameChat: false,
   messages: [],
   socket: undefined,
   messagesSearch: false,
@@ -69,6 +72,11 @@ const reducer = (state, action) => {
       return {
         ...state,
         currentChatUser: action.user,
+      };
+    case IS_ON_SAME_CHAT:
+      return {
+        ...state,
+        isOnSameChat: action.status,
       };
     case SET_MESSAGES:
       return {
@@ -158,7 +166,50 @@ const reducer = (state, action) => {
       if (!userFound) {
         return {
           ...state,
-          refreshContacts: !state.refreshContacts,
+          refreshContacts: !state.refreshContacts, // this variable will refresh contactlist api...
+        };
+      }
+
+      return {
+        ...state,
+        userContacts: updatedContacts,
+      };
+    }
+    case UPDATE_MESSAGE_STATUS: {
+      const { userId, contactId } = action.data;
+      const updatedContacts = state.userContacts.map((contact) => {
+        if (
+          contact.id === userId &&
+          contact.senderId === contactId &&
+          contact.recieverId === userId
+        ) {
+          return {
+            ...contact,
+            messageStatus: "read",
+          };
+        } else return contact;
+      });
+
+      if (state.isOnSameChat) {
+        const updatedMessages = state.messages.map((message) => {
+          if (
+            message.senderId === contactId &&
+            message.recieverId === userId &&
+            message.messageStatus !== "read"
+          ) {
+            return {
+              ...message,
+              messageStatus: "read",
+            };
+          } else {
+            return message;
+          }
+        });
+
+        return {
+          ...state,
+          userContacts: updatedContacts,
+          messages:updatedMessages,
         };
       }
 

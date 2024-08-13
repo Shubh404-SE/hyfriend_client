@@ -16,7 +16,7 @@ const CaptureAudio = dynamic(() => import("../common/CaptureAudio"), {
 });
 
 function MessageBar() {
-  const [{ userInfo, currentChatUser, userContacts, socket, isTyping }, dispatch] =
+  const [{ userInfo, currentChatUser, isOnSameChat, socket, isTyping }, dispatch] =
     useStateProvider();
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -141,18 +141,33 @@ function MessageBar() {
           message: response.data.message,
         });
 
-        dispatch({
-          type:UPDATE_USER_CONTACTS_ON_SEND,
-          data:response.data
-        });
+        if(isOnSameChat){
+          const newMessage = {...response.data.message, messageStatus: 'read' };
+          const newData = { ...response.data, message:newMessage};
+          dispatch({
+            type:UPDATE_USER_CONTACTS_ON_SEND,
+            data: newData,
+          });
 
-        dispatch({
-          type: ADD_MESSAGE,
-          newMessage: {
-            ...response.data.message,
-          },
-          fromSelf: true,
-        });
+          dispatch({
+            type: ADD_MESSAGE,
+            newMessage,
+            fromSelf: true,
+          });
+        }else{
+          dispatch({
+            type:UPDATE_USER_CONTACTS_ON_SEND,
+            data:response.data
+          });
+  
+          dispatch({
+            type: ADD_MESSAGE,
+            newMessage: {
+              ...response.data.message,
+            },
+            fromSelf: true,
+          });
+        }
 
         setAttachmentPreview(null);
         setPhotoMessage(null);
@@ -176,18 +191,34 @@ function MessageBar() {
           message: data.message,
         });
 
-        dispatch({
-          type:UPDATE_USER_CONTACTS_ON_SEND,
-          data: data
-        });
+        if(isOnSameChat){
+          const newMessage = {...data.message, messageStatus: 'read' };
+          const newData = { ...data, message:newMessage};
+          dispatch({
+            type:UPDATE_USER_CONTACTS_ON_SEND,
+            data: newData,
+          });
 
-        dispatch({
-          type: ADD_MESSAGE,
-          newMessage: {
-            ...data.message,
-          },
-          fromSelf: true,
-        });
+          dispatch({
+            type: ADD_MESSAGE,
+            newMessage,
+            fromSelf: true,
+          });
+        }else{
+          dispatch({
+            type:UPDATE_USER_CONTACTS_ON_SEND,
+            data: data
+          });
+  
+          dispatch({
+            type: ADD_MESSAGE,
+            newMessage: {
+              ...data.message,
+            },
+            fromSelf: true,
+          });
+        }
+
 
         setMessage("");
         isTypingRef.current = false;

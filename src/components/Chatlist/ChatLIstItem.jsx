@@ -12,10 +12,25 @@ import { FaCamera, FaMicrophone } from "react-icons/fa";
 
 function ChatListItem({ data, isContactPage }) {
   const [
-    { userInfo, isTyping, onlineUsers, currentChatUser, userContacts },
+    { userInfo, isTyping, onlineUsers, currentChatUser, userContacts, socket },
     dispatch,
   ] = useStateProvider();
   const handleContactClick = () => {
+    // Emit change-chat event when switching from one chat to another
+    if (currentChatUser && currentChatUser.id !== data.id) {
+      socket.current.emit("change-chat", {
+        userId: userInfo.id,
+        previousContactId: currentChatUser?.id,
+        newContactId: data.id,
+      });
+    } else {
+      // Notify the server about the active chat
+      socket.current.emit("active-chat", {
+        userId: userInfo.id,
+        contactId: data.id,
+      });
+    }
+
     if (!isContactPage) {
       // Update the current chat user in state
       dispatch({
@@ -29,11 +44,13 @@ function ChatListItem({ data, isContactPage }) {
         },
       });
 
-      // Notify the server about the active chat
-      // socket.current.emit("active-chat", {
-      //   userId: userInfo.id,
-      //   contactId: currentChatUser.id,
-      // });
+      if (data.totalUnreadMessages > 0) {
+        // Emit socket event to mark messages as read if there are unreadmessages
+        socket.current.emit("mark-messages-read", {
+          userId: userInfo.id,
+          contactId: data.id,
+        });
+      }
 
       // Reset unread messages count
       const updatedContacts = userContacts.map((contact) =>
@@ -46,7 +63,6 @@ function ChatListItem({ data, isContactPage }) {
         type: SET_USER_CONTACTS,
         userContacts: updatedContacts,
       });
-      
     } else {
       dispatch({
         type: CHANGE_CURRENT_CHAT_USER,
@@ -61,7 +77,7 @@ function ChatListItem({ data, isContactPage }) {
   return (
     <div
       className={`flex cursor-pointer items-center ${
-        (currentChatUser && currentChatUser.id === data.id)
+        currentChatUser && currentChatUser.id === data.id
           ? "bg-conversation-panel-background"
           : ""
       } hover:bg-background-default-hover`}

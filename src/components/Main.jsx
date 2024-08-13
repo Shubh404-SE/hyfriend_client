@@ -12,6 +12,7 @@ import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import {
   ADD_MESSAGE,
   END_CALL,
+  IS_ON_SAME_CHAT,
   SET_INCOMING_VIDEO_CALL,
   SET_INCOMING_VOICE_CALL,
   SET_IS_TYPING,
@@ -19,8 +20,8 @@ import {
   SET_NOT_TYPING,
   SET_ONLINE_USERS,
   SET_SOCKET,
-  SET_USER_CONTACTS,
   SET_USER_INFO,
+  UPDATE_MESSAGE_STATUS,
   UPDATE_USER_CONTACTS_ON_RECEIVE,
 } from "@/context/constants";
 import Chat from "./Chat/Chat";
@@ -41,6 +42,7 @@ function Main() {
       currentChatUser,
       messagesSearch,
       userContacts,
+      isOnSameChat,
       profilePage,
       voiceCall,
       incomingVoiceCall,
@@ -178,20 +180,12 @@ function Main() {
         const chatUser = currentChatUserRef.current;
 
         dispatch({
-          type:UPDATE_USER_CONTACTS_ON_RECEIVE,
-          data:{from, message, to},
-        })
+          type: UPDATE_USER_CONTACTS_ON_RECEIVE,
+          data: { from, message, to },
+        });
 
-        if (chatUser?.id === data.from) { // receiver and sender are at each others chat. 
-
-          // emit socket to sender to change that message status to read.
-          /**
-           * what should we send as data to sender so that he can update that message status, 
-           * senderId -> data.from,
-           * messageId -> data.message.id
-           */
-
-
+        if (chatUser?.id === data.from) {
+          // receiver and sender are at each others chat.
 
           dispatch({
             type: ADD_MESSAGE,
@@ -218,6 +212,24 @@ function Main() {
           );
           playNotificationSound(); // play notification sound.
         }
+      });
+
+      socket.current.on("is-on-same-chat", ({ status }) => {
+        dispatch({
+          type: IS_ON_SAME_CHAT,
+          status,
+        });
+      });
+
+      // message status change
+      socket.current.on("msg-status-update", ({ userId, contactId }) => {
+        dispatch({
+          type: UPDATE_MESSAGE_STATUS,
+          data: {
+            userId,
+            contactId,
+          },
+        });
       });
 
       // recieving socket for incoming calls
