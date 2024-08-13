@@ -15,7 +15,8 @@ import {
 import ContextMenu from "../common/ContextMenu";
 
 function ChatHeader() {
-  const [{ currentChatUser, userInfo, onlineUsers }, dispatch] = useStateProvider();
+  const [{ currentChatUser, userInfo, onlineUsers, socket }, dispatch] =
+    useStateProvider();
   const [isContextMenue, setIsContextMenue] = useState(false);
   const [contextMenueCordinates, setContextMenueCordinates] = useState({
     x: 0,
@@ -25,13 +26,18 @@ function ChatHeader() {
   const showContextMenue = (e) => {
     e.preventDefault();
     setIsContextMenue(true);
-    setContextMenueCordinates({ x: e.pageX -50, y: e.pageY +26 });
+    setContextMenueCordinates({ x: e.pageX - 50, y: e.pageY + 26 });
   };
 
   const contextMenuOptions = [
     {
       name: "Exit",
       callback: async () => {
+        socket.current.emit("change-chat", {
+          userId: userInfo.id,
+          previousContactId: currentChatUser?.id,
+          newContactId: null,
+        });
         dispatch({ type: SET_EXIT_CHAT });
       },
     },
@@ -63,10 +69,11 @@ function ChatHeader() {
 
   return (
     <div className=" h-16 px-4 py-3 flex justify-between items-center bg-panel-header-background z-10">
-      <div className=" flex items-center justify-center gap-6 cursor-pointer"
-      onClick={()=>{
-        dispatch({type:SET_PROFILE_PAGE, pageType:"chatuser"});
-      }}
+      <div
+        className=" flex items-center justify-center gap-6 cursor-pointer"
+        onClick={() => {
+          dispatch({ type: SET_PROFILE_PAGE, pageType: "chatuser" });
+        }}
       >
         <Avatar
           type="sm"
@@ -79,9 +86,7 @@ function ChatHeader() {
         <div className="flex flex-col">
           <span className="text-primary-strong">{currentChatUser?.name}</span>
           <span className="text-secondary text-sm">
-            {
-              onlineUsers.includes(currentChatUser.id) ? "online":"offline"
-            }
+            {onlineUsers.includes(currentChatUser.id) ? "online" : "offline"}
           </span>
         </div>
       </div>

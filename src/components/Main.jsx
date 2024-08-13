@@ -11,6 +11,7 @@ import axios from "axios";
 import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import {
   ADD_MESSAGE,
+  CHANGE_CURRENT_CHAT_USER,
   END_CALL,
   IS_ON_SAME_CHAT,
   SET_INCOMING_VIDEO_CALL,
@@ -58,7 +59,17 @@ function Main() {
   // const [redirectLogin, setRedirectLogin] = useState(false);
   const [socketEvent, setSocketEvent] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
-  // const [allowSound, setAllowSound] = useState(false);
+
+  useEffect(() => {
+    console.log("hello");
+    const chatUser = localStorage.getItem("currentChatUser");
+    if (chatUser) {
+      dispatch({
+        type: CHANGE_CURRENT_CHAT_USER,
+        user: JSON.parse(chatUser),
+      });
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (!userInfo) router.push("/login");
@@ -144,7 +155,7 @@ function Main() {
         messages,
       });
     };
-    if (currentChatUser?.id) {
+    if (currentChatUser?.id && userInfo?.id) {
       getMessages();
     }
   }, [currentChatUser]);

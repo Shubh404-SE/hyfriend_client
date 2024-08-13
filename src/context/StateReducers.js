@@ -68,11 +68,13 @@ const reducer = (state, action) => {
         ...state,
         profilePage: action.pageType,
       };
-    case CHANGE_CURRENT_CHAT_USER:
+    case CHANGE_CURRENT_CHAT_USER: {
+      localStorage.setItem("currentChatUser", JSON.stringify(action.user));
       return {
         ...state,
         currentChatUser: action.user,
       };
+    }
     case IS_ON_SAME_CHAT:
       return {
         ...state,
@@ -209,7 +211,7 @@ const reducer = (state, action) => {
         return {
           ...state,
           userContacts: updatedContacts,
-          messages:updatedMessages,
+          messages: updatedMessages,
         };
       }
 
@@ -274,6 +276,7 @@ const reducer = (state, action) => {
         incomingVoiceCall: undefined,
       };
     case SET_EXIT_CHAT:
+      localStorage.removeItem("currentChatUser");
       return {
         ...state,
         currentChatUser: undefined,
