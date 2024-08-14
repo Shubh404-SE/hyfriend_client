@@ -18,15 +18,11 @@ function ChatHeader() {
   const [{ currentChatUser, userInfo, onlineUsers, socket }, dispatch] =
     useStateProvider();
   const [isContextMenue, setIsContextMenue] = useState(false);
-  const [contextMenueCordinates, setContextMenueCordinates] = useState({
-    x: 0,
-    y: 0,
-  });
+  
 
   const showContextMenue = (e) => {
     e.preventDefault();
     setIsContextMenue(true);
-    setContextMenueCordinates({ x: e.pageX - 50, y: e.pageY + 26 });
   };
 
   const contextMenuOptions = [
@@ -68,7 +64,7 @@ function ChatHeader() {
   };
 
   return (
-    <div className=" h-16 px-4 py-3 flex justify-between items-center bg-panel-header-background z-10">
+    <div className=" h-16 px-4 py-3 flex gap-2 items-center bg-panel-header-background z-10">
       <div
         className=" flex items-center justify-center gap-6 cursor-pointer"
         onClick={() => {
@@ -90,33 +86,41 @@ function ChatHeader() {
           </span>
         </div>
       </div>
-      <div className="flex gap-6">
-        <MdCall
+      <div className="flex items-center justify-center gap-3 ml-auto">
+        <div
+          className="text-panel-header-icon cursor-pointer text-xl hover:bg-conversation-panel-background rounded-full p-2"
           onClick={handleVoiceCall}
-          className=" text-panel-header-icon cursor-pointer text-xl"
-        />
-        <IoVideocam
+        >
+          <MdCall title="Voice Call" />
+        </div>
+        <div
+          className="text-panel-header-icon cursor-pointer text-xl hover:bg-conversation-panel-background rounded-full p-2 "
           onClick={handleVideoCall}
-          className=" text-panel-header-icon cursor-pointer text-xl"
-        />
-        <BiSearchAlt2
-          className=" text-panel-header-icon cursor-pointer text-xl"
+        >
+          <IoVideocam title="Video Call" />
+        </div>
+        <div
+          className="text-panel-header-icon cursor-pointer text-xl hover:bg-conversation-panel-background rounded-full p-2 "
           onClick={() => dispatch({ type: SET_MESSAGE_SEARCH })}
-        />
-
-        <BsThreeDotsVertical
-          onClick={(e) => showContextMenue(e)}
-          id="context_opener"
-          className=" text-panel-header-icon cursor-pointer text-xl"
-        />
-        {isContextMenue && (
-          <ContextMenu
-            options={contextMenuOptions}
-            cordinates={contextMenueCordinates}
-            contextMenu={isContextMenue}
-            setContextMenu={setIsContextMenue}
-          />
-        )}
+        >
+          <BiSearchAlt2 title="Search Message" />
+        </div>
+        <div className=" relative">
+          <div
+            className="text-panel-header-icon cursor-pointer text-xl hover:bg-conversation-panel-background rounded-full p-2"
+            onClick={(e) => showContextMenue(e)}
+            id="context_opener"
+          >
+            <BsThreeDotsVertical  id="context_opener" title="Options" />
+          </div>
+          {isContextMenue && (
+            <ContextMenu
+              options={contextMenuOptions}
+              contextMenu={isContextMenue}
+              setContextMenu={setIsContextMenue}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

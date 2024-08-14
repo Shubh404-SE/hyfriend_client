@@ -81,7 +81,12 @@ function Avatar({ type, image, setImage }) {
       <div className="flex items-center justify-center">
         {type === "sm" && (
           <div className=" relative h-10 w-10">
-            <Image src={image? image:`/default_avatar.png`} alt="Avatar" className=" rounded-full" fill />
+            <Image
+              src={image ? image : `/default_avatar.png`}
+              alt="Avatar"
+              className=" rounded-full"
+              fill
+            />
           </div>
         )}
         {type === "lg" && (
@@ -91,7 +96,12 @@ function Avatar({ type, image, setImage }) {
         )}
         {type === "xll" && (
           <div className=" relative h-60 w-60">
-            <Image src={image? image:`/default_avatar.png`} alt="Avatar" className=" rounded-full" fill />
+            <Image
+              src={image ? image : `/default_avatar.png`}
+              alt="Avatar"
+              className=" rounded-full"
+              fill
+            />
           </div>
         )}
         {type === "xl" && (
@@ -107,11 +117,21 @@ function Avatar({ type, image, setImage }) {
               onClick={(e) => showContextMenue(e)}
               id="context_opener"
             >
-              <FaCamera
-                className=" text-2xl"
-                onClick={(e) => showContextMenue(e)}
-                id="context_opener"
-              />
+              <div className="relative">
+                <FaCamera
+                  className=" text-2xl"
+                  onClick={(e) => showContextMenue(e)}
+                  id="context_opener"
+                />
+                {isContextMenue && (
+                  <ContextMenu
+                    options={contextMenuOptions}
+                    cordinates={contextMenueCordinates}
+                    contextMenu={isContextMenue}
+                    setContextMenu={setIsContextMenue}
+                  />
+                )}
+              </div>
               <span
                 className=" text-white"
                 onClick={(e) => showContextMenue(e)}
@@ -126,14 +146,6 @@ function Avatar({ type, image, setImage }) {
           </div>
         )}
         <div>
-          {isContextMenue && (
-            <ContextMenu
-              options={contextMenuOptions}
-              cordinates={contextMenueCordinates}
-              contextMenu={isContextMenue}
-              setContextMenu={setIsContextMenue}
-            />
-          )}
           {grabPhoto && <PhotoPicker onChange={photoPickerChange} />}
           {showPhotoLibrary && (
             <PhotoLibrary

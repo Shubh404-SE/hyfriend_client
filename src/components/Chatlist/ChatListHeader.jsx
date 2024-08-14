@@ -18,7 +18,6 @@ function ChatListHeader() {
   const showContextMenue = (e) => {
     e.preventDefault();
     setIsContextMenue(true);
-    setContextMenueCordinates({ x: e.pageX -61, y: e.pageY +40 });
   };
 
   const contextMenuOptions = [
@@ -54,7 +53,7 @@ function ChatListHeader() {
           title="New Chat"
           onClick={handleAllContactsPage}
         />
-        <>
+        <div className="relative">
           <BsThreeDotsVertical
             className=" text-panel-header-icon cursor-pointer text-xl"
             title="Menu"
@@ -64,12 +63,11 @@ function ChatListHeader() {
           {isContextMenue && (
           <ContextMenu
             options={contextMenuOptions}
-            cordinates={contextMenueCordinates}
             contextMenu={isContextMenue}
             setContextMenu={setIsContextMenue}
           />
         )}
-        </>
+        </div>
       </div>
     </div>
   );
