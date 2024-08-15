@@ -126,27 +126,6 @@ function VoiceMessage({ message, options }) {
             )}
           </div>
         </div>
-        <div
-        className={`${showMenu ? "" : "hidden"} group-hover:flex absolute
-              -right-0 -top-[1px] cursor-pointer
-            `}
-        onClick={() => setShowMenu(true)}
-      >
-        <FaAngleDown
-          className="text-panel-header-icon text-base hover:text-white hover:bg-inherit"
-          id="context_opener"
-          onClick={() => setShowMenu(true)}
-        />
-        {showMenu && (
-          <MessageMenu
-            self={self}
-            setShowMenu={setShowMenu}
-            showMenu={showMenu}
-            options={options}
-            message={message}
-          />
-        )}
-      </div>
       </div>
     </div>
   );

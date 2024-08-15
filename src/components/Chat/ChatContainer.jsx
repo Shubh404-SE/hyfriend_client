@@ -1,18 +1,8 @@
 import { useStateProvider } from "@/context/StateContext";
 import React, { useEffect, useRef, useState } from "react";
-import ImageMessage from "./ImageMessage";
 import { PhotoProvider } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
-import dynamic from "next/dynamic";
-import {
-  MdDeleteOutline,
-  MdOutlineAddReaction,
-  MdOutlineInfo,
-  MdOutlineReply,
-} from "react-icons/md";
-import { FaRegCopy } from "react-icons/fa";
-import TextMessage from "./TextMessage";
-const VoiceMessage = dynamic(() => import("./VoiceMessage"), { ssr: false });
+import MessageBox from "./MessageBox";
 
 function ChatContainer() {
   const [{ messages, currentChatUser, userInfo }] = useStateProvider();
@@ -29,49 +19,6 @@ function ChatContainer() {
     }, 0);
   }, [currentChatUser, userInfo, messages]);
 
-  const handleMessageReply = (message) => {
-    console.log("reply to ", message);
-  };
-  const handleCopyMessage = (message) => {
-    console.log("copy to ", message);
-  };
-  const handleMessageDelete = (message) => {
-    console.log("delete to ", message);
-  };
-  const handleMessageReact = (message) => {
-    console.log("react to ", message);
-  };
-  const handleMessageInfo = (message) => {
-    console.log("info to ", message);
-  };
-
-  const options = [
-    {
-      name: "React Emoji",
-      Icon: <MdOutlineAddReaction />,
-      callback: (message) => handleMessageReact(message),
-    },
-    {
-      name: "Reply",
-      Icon: <MdOutlineReply />,
-      callback: (message) => handleMessageReply(message),
-    },
-    {
-      name: "Copy",
-      Icon: <FaRegCopy />,
-      callback: (message) => handleCopyMessage(message),
-    },
-    {
-      name: "Delete",
-      Icon: <MdDeleteOutline />,
-      callback: (message) => handleMessageDelete(message),
-    },
-    {
-      name: "Info",
-      Icon: <MdOutlineInfo />,
-      callback: (message) => handleMessageInfo(message),
-    },
-  ];
 
   return (
     <div
@@ -99,19 +46,7 @@ function ChatContainer() {
                       : "justify-end"
                   }`}
                 >
-                  {message.type === "text" && (
-                    <TextMessage message={message} options={options} />
-                  )}
-                  {message.type === "image" && (
-                    <ImageMessage
-                      message={message}
-                      index={index}
-                      options={options}
-                    />
-                  )}
-                  {message.type === "audio" && (
-                    <VoiceMessage message={message} options={options} />
-                  )}
+                  <MessageBox message={message} index={index} />
                 </div>
               ))}
             </div>

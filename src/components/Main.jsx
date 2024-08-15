@@ -61,7 +61,6 @@ function Main() {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   useEffect(() => {
-    console.log("hello");
     const chatUser = localStorage.getItem("currentChatUser");
     if (chatUser) {
       dispatch({
