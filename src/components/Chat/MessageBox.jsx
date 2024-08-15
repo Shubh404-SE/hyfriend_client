@@ -21,7 +21,7 @@ const MessageBox = ({ message, index }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const self = message?.senderId === currentChatUser?.id;
-
+  
   const handleMessageReply = (message) => {
     console.log("reply to ", message);
   };
@@ -47,9 +47,7 @@ const MessageBox = ({ message, index }) => {
   const handleMessageInfo = (message) => {
     console.log("info to ", message);
   };
-  const deleteMesasge = (action) =>{
-
-  }
+  const deleteMesasge = (action) => {};
 
   const options = [
     {
@@ -84,6 +82,13 @@ const MessageBox = ({ message, index }) => {
 
   return (
     <div className="group relative">
+      <div>
+        {message.type === "text" && <TextMessage message={message} />}
+        {message.type === "image" && (
+          <ImageMessage message={message} index={index} />
+        )}
+        {message.type === "audio" && <VoiceMessage message={message} />}
+      </div>
       {showDeletePopup && (
         <DeleteMsgPopup
           onHide={() => setShowDeletePopup(false)}
@@ -92,17 +97,9 @@ const MessageBox = ({ message, index }) => {
           shortHeight={true}
           self={self}
           deleteMesasge={deleteMesasge}
+          title={message.type === "text" ? message.message : message.type}
+          message={message}
         />
-      )}
-
-      {message.type === "text" && (
-        <TextMessage message={message} options={options} />
-      )}
-      {message.type === "image" && (
-        <ImageMessage message={message} index={index} options={options} />
-      )}
-      {message.type === "audio" && (
-        <VoiceMessage message={message} options={options} />
       )}
       <div
         className={`${showMenu ? "" : "hidden"} group-hover:flex absolute

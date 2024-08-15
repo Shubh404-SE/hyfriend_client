@@ -5,10 +5,8 @@ import Image from "next/image";
 import React, { useState } from "react";
 import MessageStatus from "../common/MessageStatus";
 import { PhotoView } from "react-photo-view";
-import { FaAngleDown } from "react-icons/fa";
-import MessageMenu from "./MessageMenu";
 
-function ImageMessage({ message, index, options }) {
+function ImageMessage({ message, index }) {
   const [{ currentChatUser, userInfo }] = useStateProvider();
   const [showMenu, setShowMenu] = useState(false);
   const self = message?.senderId === currentChatUser?.id;
@@ -22,7 +20,7 @@ function ImageMessage({ message, index, options }) {
       }`}
     >
       <div className="relative group">
-        <PhotoView key={index} src={`${HOST}/${message.message}`}>
+        <PhotoView key={index? index: 1} src={`${HOST}/${message.message}`}>
           <Image
             src={`${HOST}/${message.message}`}
             className=" rounded-lg"

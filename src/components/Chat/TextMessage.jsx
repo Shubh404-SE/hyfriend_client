@@ -5,7 +5,7 @@ import { calculateTime } from "@/utils/CalculateTime";
 import { FaAngleDown, FaRegCopy } from "react-icons/fa";
 import MessageMenu from "./MessageMenu";
 
-function TextMessage({ message, options }) {
+function TextMessage({ message }) {
   const [{ currentChatUser, userInfo }] = useStateProvider();
 
   return (

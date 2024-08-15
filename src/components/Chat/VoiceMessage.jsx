@@ -8,7 +8,7 @@ import { calculateTime } from "@/utils/CalculateTime";
 import MessageStatus from "../common/MessageStatus";
 import MessageMenu from "./MessageMenu";
 
-function VoiceMessage({ message, options }) {
+function VoiceMessage({ message }) {
   const [{ currentChatUser, userInfo }] = useStateProvider();
 
   const [audioMessage, setAudioMessage] = useState(null);
@@ -96,7 +96,7 @@ function VoiceMessage({ message, options }) {
 
   return (
     <div
-      className={`text-white px-2 py-4  flex gap-5 items-center text-sm rounded-md ${
+      className={`text-white px-2 py-4  flex gap-4 items-center text-sm rounded-md ${
         message.senderId === currentChatUser.id
           ? " bg-incoming-background"
           : "bg-outgoing-background"
