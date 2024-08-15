@@ -3,6 +3,34 @@
 @tailwind utilities;
 
 
+.emoji-3d {
+    text-shadow: 1px 1px 1px #ffffff55, 2px 2px 2px #fffdfd33;
+    cursor: pointer;
+    min-width: 20px; 
+    transition: all;
+    transition-duration: 400ms;
+    transition-property: all;
+}
+
+.emoji-3d:hover{
+    transform: scale(1.5);
+}
+
+@keyframes emoji-appear {
+    0% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .animate-emoji-appear {
+    animation: emoji-appear 0.5s ease-in-out;
+  }
+
 .scrollbar {
     scrollbar-color: #2e343d transparent;
     scrollbar-width: thin;

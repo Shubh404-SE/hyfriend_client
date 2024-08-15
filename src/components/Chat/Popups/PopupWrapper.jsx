@@ -6,14 +6,14 @@ const VoiceMessage = dynamic(() => import("../VoiceMessage"), { ssr: false });
 
 const PopupWrapper = (props) => {
   return (
-    <div className="fixed inset-0 z-20 flex items-center justify-center">
+    <div className="fixed inset-0 z-20 flex items-center justify-center select-none">
       <div
         className="w-full h-full absolute glass-effect"
         onClick={props.onHide}
       ></div>
 
       <div
-        className={`relative z-10 bg-panel-header-background rounded-3xl flex flex-col items-center max-h-[80%] ml-[20%] m-2 ${
+        className={`relative z-10 flex flex-col items-center max-h-[80%] ml-[20%] m-2 ${
           props.shortHeight ? "" : "min-h-[600px]"
         }`}
       >
@@ -36,7 +36,7 @@ const PopupWrapper = (props) => {
           )}
         </div>
 
-        <div className="grow flex flex-col p-6 pt-0">{props.children}</div>
+        <div className="grow flex flex-col -mt-10">{props.children}</div>
       </div>
     </div>
   );

@@ -15,11 +15,13 @@ import { toast } from "react-toastify";
 import MessageMenu from "./MessageMenu";
 import { useStateProvider } from "@/context/StateContext";
 import DeleteMsgPopup from "./Popups/DeleteMsgPopoup";
+import ReactMsgPopoup from "./Popups/ReactMsgPopoup";
 
 const MessageBox = ({ message, index }) => {
   const [{ currentChatUser, userInfo }] = useStateProvider();
   const [showMenu, setShowMenu] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [showReactPopup, setShowReactPopup] = useState(false);
   const self = message?.senderId === currentChatUser?.id;
   
   const handleMessageReply = (message) => {
@@ -41,8 +43,8 @@ const MessageBox = ({ message, index }) => {
         });
     }
   };
-  const handleMessageReact = (message) => {
-    console.log("react to ", message);
+  const handleMessageReact = (message, emoji) => {
+    console.log("react to ", message, emoji);
   };
   const handleMessageInfo = (message) => {
     console.log("info to ", message);
@@ -53,7 +55,10 @@ const MessageBox = ({ message, index }) => {
     {
       name: "React Emoji",
       Icon: <MdOutlineAddReaction />,
-      callback: (message) => handleMessageReact(message),
+      callback: () => {
+        setShowReactPopup(true);
+        setShowMenu(false);
+      },
     },
     {
       name: "Reply",
@@ -97,7 +102,17 @@ const MessageBox = ({ message, index }) => {
           shortHeight={true}
           self={self}
           deleteMesasge={deleteMesasge}
-          title={message.type === "text" ? message.message : message.type}
+          message={message}
+        />
+      )}
+      {showReactPopup && (
+        <ReactMsgPopoup
+          onHide={() => setShowReactPopup(false)}
+          className="ReactMsgPopup"
+          noHeader={true}
+          shortHeight={true}
+          self={self}
+          handleMessageReact={handleMessageReact}
           message={message}
         />
       )}
