@@ -1,11 +1,17 @@
 import { useStateProvider } from "@/context/StateContext";
-import { calculateTime } from "@/utils/CalculateTime";
-import React, { useEffect, useRef } from "react";
-import MessageStatus from "../common/MessageStatus";
+import React, { useEffect, useRef, useState } from "react";
 import ImageMessage from "./ImageMessage";
 import { PhotoProvider } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
 import dynamic from "next/dynamic";
+import {
+  MdDeleteOutline,
+  MdOutlineAddReaction,
+  MdOutlineInfo,
+  MdOutlineReply,
+} from "react-icons/md";
+import { FaRegCopy } from "react-icons/fa";
+import TextMessage from "./TextMessage";
 const VoiceMessage = dynamic(() => import("./VoiceMessage"), { ssr: false });
 
 function ChatContainer() {
@@ -23,13 +29,57 @@ function ChatContainer() {
     }, 0);
   }, [currentChatUser, userInfo, messages]);
 
+  const handleMessageReply = (message) => {
+    console.log("reply to ", message);
+  };
+  const handleCopyMessage = (message) => {
+    console.log("copy to ", message);
+  };
+  const handleMessageDelete = (message) => {
+    console.log("delete to ", message);
+  };
+  const handleMessageReact = (message) => {
+    console.log("react to ", message);
+  };
+  const handleMessageInfo = (message) => {
+    console.log("info to ", message);
+  };
+
+  const options = [
+    {
+      name: "React Emoji",
+      Icon: <MdOutlineAddReaction />,
+      callback: (message) => handleMessageReact(message),
+    },
+    {
+      name: "Reply",
+      Icon: <MdOutlineReply />,
+      callback: (message) => handleMessageReply(message),
+    },
+    {
+      name: "Copy",
+      Icon: <FaRegCopy />,
+      callback: (message) => handleCopyMessage(message),
+    },
+    {
+      name: "Delete",
+      Icon: <MdDeleteOutline />,
+      callback: (message) => handleMessageDelete(message),
+    },
+    {
+      name: "Info",
+      Icon: <MdOutlineInfo />,
+      callback: (message) => handleMessageInfo(message),
+    },
+  ];
+
   return (
     <div
       ref={ref}
-      className="h-[80vh] w-full relative flex-grow overflow-auto custom-scrollbar"
+      className="h-[80vh] w-full grow overflow-auto custom-scrollbar"
     >
       <div className=" bg-chat-background bg-fixed h-full w-full opacity-5 fixed left-0 top-0"></div>
-      <div className="mx-10 my-6 relative bottom-0 left-0  z-0">
+      <div className="mx-8 my-6 relative bottom-0 left-0  z-0">
         <div className="flex w-full">
           <PhotoProvider
             speed={() => 500}
@@ -39,7 +89,7 @@ function ChatContainer() {
                 : "cubic-bezier(0.34, 1.56, 0.64, 1)"
             }
           >
-            <div className="flex flex-col justify-end w-full gap-1 overflow-auto">
+            <div className="grow  flex flex-col gap-1">
               {messages.map((message, index) => (
                 <div
                   key={message.id}
@@ -50,33 +100,17 @@ function ChatContainer() {
                   }`}
                 >
                   {message.type === "text" && (
-                    <div
-                      className={`text-white px-2 py-[5px] text-sm rounded-md flex gap-2 items-end max-w-[45%] ${
-                        message.senderId === currentChatUser.id
-                          ? " bg-incoming-background"
-                          : "bg-outgoing-background"
-                      }`}
-                    >
-                      <span className=" break-all">{message.message}</span>
-                      <div className="flex gap-1 items-end">
-                        <span className=" text-bubble-meta text-[11px] pt-1 min-w-fit">
-                          {calculateTime(message.createdAt)}
-                        </span>
-                        <span>
-                          {message.senderId === userInfo.id && (
-                            <MessageStatus
-                              messageStatus={message.messageStatus}
-                            />
-                          )}
-                        </span>
-                      </div>
-                    </div>
+                    <TextMessage message={message} options={options} />
                   )}
                   {message.type === "image" && (
-                    <ImageMessage message={message} index={index} />
+                    <ImageMessage
+                      message={message}
+                      index={index}
+                      options={options}
+                    />
                   )}
                   {message.type === "audio" && (
-                    <VoiceMessage message={message} />
+                    <VoiceMessage message={message} options={options} />
                   )}
                 </div>
               ))}

@@ -3,18 +3,20 @@ import { HOST } from "@/utils/ApiRoutes";
 import React, { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 import Avatar from "../common/Avatar";
-import { FaPlay, FaStop } from "react-icons/fa";
+import { FaAngleDown, FaPlay, FaStop } from "react-icons/fa";
 import { calculateTime } from "@/utils/CalculateTime";
 import MessageStatus from "../common/MessageStatus";
+import MessageMenu from "./MessageMenu";
 
-function VoiceMessage({ message }) {
+function VoiceMessage({ message, options }) {
   const [{ currentChatUser, userInfo }] = useStateProvider();
 
   const [audioMessage, setAudioMessage] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-
   const [currentPlaybackTime, setCurrentPlaybackTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
+  const self = message?.senderId === currentChatUser?.id;
 
   const waveFormRef = useRef(null);
   const waveForm = useRef(null);
@@ -110,7 +112,7 @@ function VoiceMessage({ message }) {
           <FaStop onClick={handlePauseAudio} />
         )}
       </div>
-      <div className="relative">
+      <div className="group relative">
         <div className="w-60" ref={waveFormRef} />
 
         <div className=" text-bubble-meta text-[11px] pt-1 flex justify-between">
@@ -124,6 +126,27 @@ function VoiceMessage({ message }) {
             )}
           </div>
         </div>
+        <div
+        className={`${showMenu ? "" : "hidden"} group-hover:flex absolute
+              -right-0 -top-[1px] cursor-pointer
+            `}
+        onClick={() => setShowMenu(true)}
+      >
+        <FaAngleDown
+          className="text-panel-header-icon text-base hover:text-white hover:bg-inherit"
+          id="context_opener"
+          onClick={() => setShowMenu(true)}
+        />
+        {showMenu && (
+          <MessageMenu
+            self={self}
+            setShowMenu={setShowMenu}
+            showMenu={showMenu}
+            options={options}
+            message={message}
+          />
+        )}
+      </div>
       </div>
     </div>
   );

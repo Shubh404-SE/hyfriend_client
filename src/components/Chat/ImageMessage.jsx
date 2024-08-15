@@ -2,12 +2,16 @@ import { useStateProvider } from "@/context/StateContext";
 import { HOST } from "@/utils/ApiRoutes";
 import { calculateTime } from "@/utils/CalculateTime";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import MessageStatus from "../common/MessageStatus";
 import { PhotoView } from "react-photo-view";
+import { FaAngleDown } from "react-icons/fa";
+import MessageMenu from "./MessageMenu";
 
-function ImageMessage({ message, index }){
+function ImageMessage({ message, index, options }) {
   const [{ currentChatUser, userInfo }] = useStateProvider();
+  const [showMenu, setShowMenu] = useState(false);
+  const self = message?.senderId === currentChatUser?.id;
 
   return (
     <div
@@ -17,7 +21,7 @@ function ImageMessage({ message, index }){
           : "bg-outgoing-background"
       }`}
     >
-      <div className="relative">
+      <div className="relative group">
         <PhotoView key={index} src={`${HOST}/${message.message}`}>
           <Image
             src={`${HOST}/${message.message}`}
@@ -38,6 +42,27 @@ function ImageMessage({ message, index }){
               )}
             </span>
           </span>
+        </div>
+        <div
+          className={`${showMenu ? "" : "hidden"} group-hover:flex absolute
+              -right-0 -top-[1px] cursor-pointer
+            `}
+          onClick={() => setShowMenu(true)}
+        >
+          <FaAngleDown
+            className="text-panel-header-icon text-base hover:text-white hover:bg-inherit"
+            id="context_opener"
+            onClick={() => setShowMenu(true)}
+          />
+          {showMenu && (
+            <MessageMenu
+              self={self}
+              setShowMenu={setShowMenu}
+              showMenu={showMenu}
+              options={options}
+              message={message}
+            />
+          )}
         </div>
       </div>
     </div>

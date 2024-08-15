@@ -12,7 +12,7 @@ function ContextMenu({ options, cordinates, contextMenu, setContextMenu }) {
         }
     }
     document.addEventListener("click", handleOutSideClick)
-  }, [])
+  }, []);
   const handleClick = (e, callback) => { 
     e.stopPropagation();
     setContextMenu(false);
