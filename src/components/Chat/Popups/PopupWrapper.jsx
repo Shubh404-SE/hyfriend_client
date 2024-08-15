@@ -6,28 +6,31 @@ const VoiceMessage = dynamic(() => import("../VoiceMessage"), { ssr: false });
 
 const PopupWrapper = (props) => {
   return (
-    <div className="fixed top-0 right-0 z-20 w-full h-full flex items-center justify-center">
+    <div className="fixed inset-0 z-20 flex items-center justify-center">
       <div
         className="w-full h-full absolute glass-effect"
         onClick={props.onHide}
       ></div>
 
       <div
-        className={`flex flex-col max-h-[80%] bg-panel-header-background relative z-10 rounded-3xl ${
-          props.shortHeight ? "" : " min-h-[600px]"
+        className={`relative z-10 bg-panel-header-background rounded-3xl flex flex-col items-center max-h-[80%] ml-[20%] m-2 ${
+          props.shortHeight ? "" : "min-h-[600px]"
         }`}
       >
+        {/* Absolute div placed just above the relative one, centered horizontally */}
         <div
-          className={`absolute ${
-            props.self ? "left-0" : "right-0"
+          className={`absolute transform ${
+            props.self ? "left-0 " : "right-0"
           } -translate-y-full -top-2`}
         >
           {props.message.type === "text" && (
             <TextMessage message={props.message} />
           )}
+
           {props.message.type === "image" && (
-            <ImageMessage message={props.message} />
+              <ImageMessage message={props.message} index={1} preview={true} />
           )}
+
           {props.message.type === "audio" && (
             <VoiceMessage message={props.message} />
           )}

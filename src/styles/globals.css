@@ -3,6 +3,27 @@
 @tailwind utilities;
 
 
+.scrollbar {
+    scrollbar-color: #2e343d transparent;
+    scrollbar-width: thin;
+}
+.scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 6px;
+}
+.scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollbar::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 10px;
+    opacity: 0;
+}
+.scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: #2e343d;
+    opacity: 1;
+}
+
 .custom-scrollbar::-webkit-scrollbar{
     height: 8px !important;
     width: 8px;

@@ -15,8 +15,6 @@ function VoiceMessage({ message }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPlaybackTime, setCurrentPlaybackTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
-  const [showMenu, setShowMenu] = useState(false);
-  const self = message?.senderId === currentChatUser?.id;
 
   const waveFormRef = useRef(null);
   const waveForm = useRef(null);
