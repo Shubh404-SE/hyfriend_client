@@ -94,14 +94,14 @@ function VoiceMessage({ message }) {
 
   return (
     <div
-      className={`text-white px-2 py-4  flex gap-4 items-center text-sm rounded-md ${
+      className={`text-white px-2 py-2  flex gap-4 items-center text-sm rounded-md ${
         message.senderId === currentChatUser.id
           ? " bg-incoming-background"
           : "bg-outgoing-background"
       }`}
     >
       <div>
-        <Avatar type="lg" image={currentChatUser?.profilePicture} />
+        <Avatar type="sm" image={currentChatUser?.profilePicture} />
       </div>
       <div className=" cursor-pointer text-xl">
         {!isPlaying ? (
@@ -111,7 +111,7 @@ function VoiceMessage({ message }) {
         )}
       </div>
       <div className="group relative">
-        <div className="w-60" ref={waveFormRef} />
+        <div className="w-24" ref={waveFormRef} />
 
         <div className=" text-bubble-meta text-[11px] pt-1 flex justify-between">
           <span>

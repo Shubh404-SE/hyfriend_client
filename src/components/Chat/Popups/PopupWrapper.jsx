@@ -36,7 +36,7 @@ const PopupWrapper = (props) => {
           )}
         </div>
 
-        <div className="grow flex flex-col -mt-10">{props.children}</div>
+        <div className="grow flex flex-col mb-5 ">{props.children}</div>
       </div>
     </div>
   );

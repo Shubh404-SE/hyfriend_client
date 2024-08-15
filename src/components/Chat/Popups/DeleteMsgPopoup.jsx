@@ -7,7 +7,7 @@ const DeleteMsgPopup = (props) => {
 
     return (
         <PopupWrapper {...props}>
-            <div className="mt-10 mb-5 bg-panel-header-background p-6 rounded-3xl">
+            <div className="bg-panel-header-background p-6 rounded-3xl">
                 <div className="flex items-center justify-center gap-3">
                     <RiErrorWarningLine size={24} className="text-red-500" />
                     <div className="text-lg">

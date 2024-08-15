@@ -16,19 +16,18 @@ import MessageMenu from "./MessageMenu";
 import { useStateProvider } from "@/context/StateContext";
 import DeleteMsgPopup from "./Popups/DeleteMsgPopoup";
 import ReactMsgPopoup from "./Popups/ReactMsgPopoup";
+import InfoPopup from "./Popups/InfoPopup";
 
 const MessageBox = ({ message, index }) => {
   const [{ currentChatUser, userInfo }] = useStateProvider();
   const [showMenu, setShowMenu] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [showReactPopup, setShowReactPopup] = useState(false);
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
   const self = message?.senderId === currentChatUser?.id;
   
-  const handleMessageReply = (message) => {
-    console.log("reply to ", message);
-  };
-  const handleCopyMessage = (message) => {
-    console.log("copy to ", message);
+
+  const handleCopyMessage = () => {
     const messageText = message.message;
     if (messageText) {
       navigator.clipboard
@@ -43,13 +42,20 @@ const MessageBox = ({ message, index }) => {
         });
     }
   };
-  const handleMessageReact = (message, emoji) => {
-    console.log("react to ", message, emoji);
+  const handleMessageReact = ( emoji) => {
+    console.log("react to ", emoji);
+    // add api call here
   };
-  const handleMessageInfo = (message) => {
-    console.log("info to ", message);
-  };
+
   const deleteMesasge = (action) => {};
+
+  const handleMessageReply = (message) => {
+    console.log("reply to ", message);
+  };
+
+  const handleMessageInfo = () => {
+    console.log("info to ");
+  };
 
   const options = [
     {
@@ -81,7 +87,10 @@ const MessageBox = ({ message, index }) => {
     {
       name: "Info",
       Icon: <MdOutlineInfo />,
-      callback: (message) => handleMessageInfo(message),
+      callback: () => {
+        setShowInfoPopup(true);
+        setShowMenu(false);
+      },
     },
   ];
 
@@ -113,6 +122,17 @@ const MessageBox = ({ message, index }) => {
           shortHeight={true}
           self={self}
           handleMessageReact={handleMessageReact}
+          message={message}
+        />
+      )}
+      {showInfoPopup && (
+        <InfoPopup
+          onHide={() => setShowInfoPopup(false)}
+          className="InfoPopup"
+          noHeader={true}
+          shortHeight={true}
+          self={self}
+          handleMessageInfo={handleMessageInfo}
           message={message}
         />
       )}
