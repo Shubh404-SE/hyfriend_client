@@ -14,7 +14,7 @@ function TextMessage({ message, preview }) {
           : "bg-outgoing-background"
       }`}
     >
-      <span className={`p-1 text-pretty ${preview? "h-[150px] truncate":""}`}>{message.message}</span>
+      <span className={`p-1 text-pretty ${preview? "max-h-[150px] truncate":""}`}>{message.message}</span>
       <div className="flex items-end justify-end">
         <span className=" text-bubble-meta text-[11px] pt-1 min-w-fit">
           {calculateTime(message.createdAt)}
