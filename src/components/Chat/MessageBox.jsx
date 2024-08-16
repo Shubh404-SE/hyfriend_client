@@ -17,9 +17,10 @@ import { useStateProvider } from "@/context/StateContext";
 import DeleteMsgPopup from "./Popups/DeleteMsgPopoup";
 import ReactMsgPopoup from "./Popups/ReactMsgPopoup";
 import InfoPopup from "./Popups/InfoPopup";
+import { REPLY_TO_MESSAGE } from "@/context/constants";
 
 const MessageBox = ({ message, index }) => {
-  const [{ currentChatUser, userInfo }] = useStateProvider();
+  const [{ currentChatUser, userInfo }, dispatch] = useStateProvider();
   const [showMenu, setShowMenu] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [showReactPopup, setShowReactPopup] = useState(false);
@@ -49,14 +50,6 @@ const MessageBox = ({ message, index }) => {
 
   const deleteMesasge = (action) => {};
 
-  const handleMessageReply = (message) => {
-    console.log("reply to ", message);
-  };
-
-  const handleMessageInfo = () => {
-    console.log("info to ");
-  };
-
   const options = [
     {
       name: "React Emoji",
@@ -69,7 +62,13 @@ const MessageBox = ({ message, index }) => {
     {
       name: "Reply",
       Icon: <MdOutlineReply />,
-      callback: (message) => handleMessageReply(message),
+      callback: () => {
+        dispatch({
+          type:REPLY_TO_MESSAGE,
+          data: {text: message.message, ReplyedMessageId:message.id, ReplyedUserId:message.senderId}
+        });
+        setShowMenu(false);
+      },
     },
     {
       name: "Copy",
@@ -132,7 +131,6 @@ const MessageBox = ({ message, index }) => {
           noHeader={true}
           shortHeight={true}
           self={self}
-          handleMessageInfo={handleMessageInfo}
           message={message}
         />
       )}

@@ -3,6 +3,7 @@ import Avatar from "../common/Avatar";
 import { useStateProvider } from "@/context/StateContext";
 import {
   CHANGE_CURRENT_CHAT_USER,
+  REPLY_TO_MESSAGE,
   SET_ALL_CONTACTS_PAGE,
   SET_USER_CONTACTS,
 } from "@/context/constants";
@@ -31,6 +32,10 @@ function ChatListItem({ data, isContactPage }) {
       });
     }
 
+    dispatch({
+      type:REPLY_TO_MESSAGE,
+      data:undefined,
+    });
     if (!isContactPage) {
       // Update the current chat user in state
       dispatch({

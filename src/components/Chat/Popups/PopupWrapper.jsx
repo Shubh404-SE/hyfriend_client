@@ -17,14 +17,13 @@ const PopupWrapper = (props) => {
           props.shortHeight ? "" : "min-h-[600px]"
         }`}
       >
-        {/* Absolute div placed just above the relative one, centered horizontally */}
         <div
           className={`absolute transform ${
             props.self ? "left-0 " : "right-0"
           } -translate-y-full -top-2`}
         >
           {props.message.type === "text" && (
-            <TextMessage message={props.message} />
+              <TextMessage message={props.message} preview={true} />
           )}
 
           {props.message.type === "image" && (

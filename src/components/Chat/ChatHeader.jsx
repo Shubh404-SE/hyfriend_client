@@ -34,6 +34,10 @@ function ChatHeader() {
           previousContactId: currentChatUser?.id,
           newContactId: null,
         });
+        dispatch({
+          type:REPLY_TO_MESSAGE,
+          data:undefined,
+        });
         dispatch({ type: SET_EXIT_CHAT });
       },
     },

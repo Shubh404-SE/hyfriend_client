@@ -3,6 +3,7 @@ import {
   CHANGE_CURRENT_CHAT_USER,
   END_CALL,
   IS_ON_SAME_CHAT,
+  REPLY_TO_MESSAGE,
   SET_ALL_CONTACTS_PAGE,
   SET_CONTACT_SEARCH,
   SET_EXIT_CHAT,
@@ -33,6 +34,7 @@ export const initialState = {
   currentChatUser: undefined,
   isOnSameChat: false,
   messages: [],
+  replyingToMessage:undefined,
   socket: undefined,
   messagesSearch: false,
   userContacts: [],
@@ -95,6 +97,11 @@ const reducer = (state, action) => {
         ...state,
         messages: [...state.messages, action.newMessage],
       };
+    case REPLY_TO_MESSAGE:
+      return{
+        ...state,
+        replyingToMessage: action.data,
+      }
     case SET_MESSAGE_SEARCH:
       return {
         ...state,
