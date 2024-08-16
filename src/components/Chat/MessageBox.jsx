@@ -29,6 +29,7 @@ const MessageBox = ({ message, index }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [showReactPopup, setShowReactPopup] = useState(false);
   const [showInfoPopup, setShowInfoPopup] = useState(false);
+  const [updatedMessage, setUpdatedMessage] = useState(message);
   const self = message?.senderId === currentChatUser?.id;
 
   const handleCopyMessage = () => {
@@ -46,18 +47,44 @@ const MessageBox = ({ message, index }) => {
         });
     }
   };
+
   const handleMessageReact = async (emoji) => {
-    console.log("react to ", emoji);
-    try{
-      const responce = await axios.post(ADD_MESSAGE_REACT_ROUTE, {
+    try {
+      const response = await axios.post(ADD_MESSAGE_REACT_ROUTE, {
         messageId: message.id,
         userId: userInfo.id,
         reaction: emoji,
       });
-      
-      console.log(responce);
 
-    }catch(err){
+      if (response.status === 201) {
+        const newReaction = { userId: userInfo.id, reaction: emoji };
+
+        // Check if there are any existing reactions from the same user
+        const existingReactionIndex = updatedMessage.reactions.findIndex(
+          (r) => r.userId === userInfo.id
+        );
+
+        let newReactions;
+
+        if (existingReactionIndex !== -1) {
+          // Update existing reaction if found
+          newReactions = [...updatedMessage.reactions];
+          newReactions[existingReactionIndex] = newReaction;
+        } else {
+          // Add new reaction to the array
+          newReactions = [newReaction, ...updatedMessage.reactions];
+        }
+
+        // Update the message with the new reactions array
+        const newMessage = {
+          ...updatedMessage,
+          reactions: newReactions,
+        };
+
+        // Update the message state
+        setUpdatedMessage(newMessage);
+      }
+    } catch (err) {
       console.log(err);
     }
   };
@@ -120,7 +147,10 @@ const MessageBox = ({ message, index }) => {
           <ImageMessage message={message} index={index} />
         )}
         {message.type === "audio" && <VoiceMessage message={message} />}
-        {message?.reactions && message?.reactions[0]?.userId && <ReactedMessage reactions={message.reactions} />}
+        {updatedMessage.reactions.length &&
+          updatedMessage?.reactions[0]?.userId && (
+            <ReactedMessage reactions={updatedMessage.reactions} />
+          )}
       </div>
       {showDeletePopup && (
         <DeleteMsgPopup

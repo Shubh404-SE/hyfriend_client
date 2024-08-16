@@ -6,8 +6,7 @@ const ReactedMessage = ({ reactions }) => {
   return (
     <div className="-mt-4 flex items-center gap-1 text-xl select-none cursor-pointer text-white">
       <div className="flex justify-center items-center">
-        {reactions[0].reaction}{" "}
-        <span className="text-sm font-bold">{reactions.length - 1 > 0 ? reactions.length - 1 : ""}</span>
+        {reactions[0].reaction}{reactions[1]?.reaction}
       </div>
     </div>
   );
