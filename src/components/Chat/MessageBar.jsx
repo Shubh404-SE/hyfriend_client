@@ -201,6 +201,21 @@ function MessageBar() {
           to: currentChatUser.id,
           from: userInfo.id,
           message,
+          replyToMessageId: replyingToMessage
+            ? replyingToMessage.ReplyedMessageId
+            : null,
+          ReplyedUserId: replyingToMessage
+            ? replyingToMessage.ReplyedUserId
+            : null,
+        });
+
+        if (replyingToMessage) {
+          data.message.repliedmessage = replyingToMessage.text;
+        }
+
+        dispatch({
+          type: REPLY_TO_MESSAGE,
+          data: undefined,
         });
         socket.current.emit("send-msg", {
           to: currentChatUser?.id,
@@ -270,7 +285,9 @@ function MessageBar() {
                     : "You"}
                 </span>
               </div>
-              <div className="text-sm font-normal max-h-3 text-wrap">{replyingToMessage.text}</div>
+              <div className="text-sm font-normal max-h-3 text-wrap">
+                {replyingToMessage.text}
+              </div>
             </div>
             <div
               className="ml-auto mr-4 text-xl cursor-pointer z-50"

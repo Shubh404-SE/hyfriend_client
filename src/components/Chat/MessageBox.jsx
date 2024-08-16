@@ -18,6 +18,7 @@ import DeleteMsgPopup from "./Popups/DeleteMsgPopoup";
 import ReactMsgPopoup from "./Popups/ReactMsgPopoup";
 import InfoPopup from "./Popups/InfoPopup";
 import { REPLY_TO_MESSAGE } from "@/context/constants";
+import ReplyedMessage from "./ReplyedMessage";
 
 const MessageBox = ({ message, index }) => {
   const [{ currentChatUser, userInfo }, dispatch] = useStateProvider();
@@ -96,6 +97,7 @@ const MessageBox = ({ message, index }) => {
   return (
     <div className="group relative">
       <div>
+        {message.replyToMessageId && <ReplyedMessage message={message} />}
         {message.type === "text" && <TextMessage message={message} />}
         {message.type === "image" && (
           <ImageMessage message={message} index={index} />
