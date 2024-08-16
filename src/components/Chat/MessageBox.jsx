@@ -19,6 +19,9 @@ import ReactMsgPopoup from "./Popups/ReactMsgPopoup";
 import InfoPopup from "./Popups/InfoPopup";
 import { REPLY_TO_MESSAGE } from "@/context/constants";
 import ReplyedMessage from "./ReplyedMessage";
+import axios from "axios";
+import { ADD_MESSAGE_REACT_ROUTE } from "@/utils/ApiRoutes";
+import ReactedMessage from "./ReactedMessage";
 
 const MessageBox = ({ message, index }) => {
   const [{ currentChatUser, userInfo }, dispatch] = useStateProvider();
@@ -27,7 +30,6 @@ const MessageBox = ({ message, index }) => {
   const [showReactPopup, setShowReactPopup] = useState(false);
   const [showInfoPopup, setShowInfoPopup] = useState(false);
   const self = message?.senderId === currentChatUser?.id;
-  
 
   const handleCopyMessage = () => {
     const messageText = message.message;
@@ -44,9 +46,20 @@ const MessageBox = ({ message, index }) => {
         });
     }
   };
-  const handleMessageReact = ( emoji) => {
+  const handleMessageReact = async (emoji) => {
     console.log("react to ", emoji);
-    // add api call here
+    try{
+      const responce = await axios.post(ADD_MESSAGE_REACT_ROUTE, {
+        messageId: message.id,
+        userId: userInfo.id,
+        reaction: emoji,
+      });
+      
+      console.log(responce);
+
+    }catch(err){
+      console.log(err);
+    }
   };
 
   const deleteMesasge = (action) => {};
@@ -65,8 +78,12 @@ const MessageBox = ({ message, index }) => {
       Icon: <MdOutlineReply />,
       callback: () => {
         dispatch({
-          type:REPLY_TO_MESSAGE,
-          data: {text: message.message, ReplyedMessageId:message.id, ReplyedUserId:message.senderId}
+          type: REPLY_TO_MESSAGE,
+          data: {
+            text: message.message,
+            ReplyedMessageId: message.id,
+            ReplyedUserId: message.senderId,
+          },
         });
         setShowMenu(false);
       },
@@ -103,6 +120,7 @@ const MessageBox = ({ message, index }) => {
           <ImageMessage message={message} index={index} />
         )}
         {message.type === "audio" && <VoiceMessage message={message} />}
+        {message?.reactions && message?.reactions[0]?.userId && <ReactedMessage reactions={message.reactions} />}
       </div>
       {showDeletePopup && (
         <DeleteMsgPopup

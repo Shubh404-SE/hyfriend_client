@@ -3,7 +3,6 @@ import React from "react";
 
 const ReplyedMessage = ({ message }) => {
   const [{ currentChatUser }] = useStateProvider();
-    console.log(currentChatUser.id);
   return (
     <div
       className={`px-2 py-[2px] text-sm -mb-2 p-2 flex rounded-t-md flex-col max-w-sm min-w-52 ${
