@@ -60,7 +60,7 @@ const MessageBox = ({ message, index }) => {
         const newReaction = { userId: userInfo.id, reaction: emoji };
 
         // Check if there are any existing reactions from the same user
-        const existingReactionIndex = updatedMessage.reactions.findIndex(
+        const existingReactionIndex = updatedMessage?.reactions?.findIndex(
           (r) => r.userId === userInfo.id
         );
 
@@ -147,7 +147,7 @@ const MessageBox = ({ message, index }) => {
           <ImageMessage message={message} index={index} />
         )}
         {message.type === "audio" && <VoiceMessage message={message} />}
-        {updatedMessage.reactions.length &&
+        {updatedMessage?.reactions?.length &&
           updatedMessage?.reactions[0]?.userId && (
             <ReactedMessage reactions={updatedMessage.reactions} />
           )}

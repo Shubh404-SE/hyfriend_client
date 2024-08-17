@@ -8,7 +8,7 @@ function TextMessage({ message, preview }) {
 
   return (
     <div
-      className={` text-white px-2 py-[2px] text-sm rounded-md flex flex-col max-w-sm min-w-24 ${
+      className={` text-white px-2 py-[1px] text-sm rounded-md flex flex-col max-w-sm min-w-24 ${
         message.senderId === currentChatUser.id
           ? " bg-incoming-background"
           : "bg-outgoing-background"
