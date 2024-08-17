@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useStateProvider } from "@/context/StateContext";
 
 const ReactedMessage = ({ reactions, setShowReactPopup }) => {
-  const [{ userInfo, currentChatUser }] = useStateProvider();
   const [animatedReactions, setAnimatedReactions] = useState([]);
   const [animate, setAnimate] = useState(false);
 

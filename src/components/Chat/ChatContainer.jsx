@@ -2,7 +2,7 @@ import { useStateProvider } from "@/context/StateContext";
 import React, { useEffect, useRef, useState } from "react";
 import { PhotoProvider } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
-import MessageBox from "./MessageBox";
+import MessageBox from "./message/MessageBox";
 
 function ChatContainer() {
   const [{ messages, currentChatUser, userInfo }] = useStateProvider();

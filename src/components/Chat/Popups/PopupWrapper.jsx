@@ -1,8 +1,8 @@
 import React from "react";
-import TextMessage from "../TextMessage";
-import ImageMessage from "../ImageMessage";
+import TextMessage from "../message/TextMessage";
+import ImageMessage from "../message/ImageMessage";
 import dynamic from "next/dynamic";
-const VoiceMessage = dynamic(() => import("../VoiceMessage"), { ssr: false });
+const VoiceMessage = dynamic(() => import("../message/VoiceMessage"), { ssr: false });
 
 const PopupWrapper = (props) => {
   return (

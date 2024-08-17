@@ -14,15 +14,15 @@ import { FaAngleDown, FaRegCopy } from "react-icons/fa";
 import { toast } from "react-toastify";
 import MessageMenu from "./MessageMenu";
 import { useStateProvider } from "@/context/StateContext";
-import DeleteMsgPopup from "./Popups/DeleteMsgPopoup";
-import ReactMsgPopoup from "./Popups/ReactMsgPopoup";
-import InfoPopup from "./Popups/InfoPopup";
+import DeleteMsgPopup from "../Popups/DeleteMsgPopoup";
+import ReactMsgPopoup from "../Popups/ReactMsgPopoup";
+import InfoPopup from "../Popups/InfoPopup";
 import { REPLY_TO_MESSAGE } from "@/context/constants";
 import ReplyedMessage from "./ReplyedMessage";
 import axios from "axios";
 import { ADD_MESSAGE_REACT_ROUTE } from "@/utils/ApiRoutes";
 import ReactedMessage from "./ReactedMessage";
-import ReactDetails from "./Popups/ReactDetails";
+import ReactDetails from "../Popups/ReactDetails";
 
 const MessageBox = ({ message, index }) => {
   const [{ currentChatUser, userInfo }, dispatch] = useStateProvider();
@@ -62,7 +62,7 @@ const MessageBox = ({ message, index }) => {
         const newReaction = { userId: userInfo.id, reaction: emoji };
 
         // Check if there are any existing reactions from the same user
-        const existingReactionIndex = updatedMessage.reactions.length
+        const existingReactionIndex = (updatedMessage?.reactions && updatedMessage?.reactions?.length)
           ? updatedMessage?.reactions?.findIndex(
               (r) => r.userId === userInfo.id
             )

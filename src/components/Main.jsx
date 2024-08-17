@@ -27,7 +27,7 @@ import {
 } from "@/context/constants";
 import Chat from "./Chat/Chat";
 import { io } from "socket.io-client";
-import SearchMessages from "./Chat/SearchMessages";
+import SearchMessages from "./Chat/message/SearchMessages";
 import VoiceCall from "./Call/VoiceCall";
 import VideoCall from "./Call/VideoCall";
 import IncomingVideoCall from "./common/IncomingVideoCall";

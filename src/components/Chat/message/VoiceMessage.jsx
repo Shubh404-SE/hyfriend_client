@@ -2,11 +2,10 @@ import { useStateProvider } from "@/context/StateContext";
 import { HOST } from "@/utils/ApiRoutes";
 import React, { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
-import Avatar from "../common/Avatar";
-import { FaAngleDown, FaPlay, FaStop } from "react-icons/fa";
+import { FaPlay, FaStop } from "react-icons/fa";
 import { calculateTime } from "@/utils/CalculateTime";
-import MessageStatus from "../common/MessageStatus";
-import MessageMenu from "./MessageMenu";
+import MessageStatus from "../../common/MessageStatus";
+import Avatar from "@/components/common/Avatar";
 
 function VoiceMessage({ message }) {
   const [{ currentChatUser, userInfo }] = useStateProvider();

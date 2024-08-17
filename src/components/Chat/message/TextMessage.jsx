@@ -1,6 +1,6 @@
 import { useStateProvider } from "@/context/StateContext";
 import React, { useState } from "react";
-import MessageStatus from "../common/MessageStatus";
+import MessageStatus from "../../common/MessageStatus";
 import { calculateTime } from "@/utils/CalculateTime";
 
 function TextMessage({ message, preview }) {
