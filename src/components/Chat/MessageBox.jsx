@@ -60,9 +60,9 @@ const MessageBox = ({ message, index }) => {
         const newReaction = { userId: userInfo.id, reaction: emoji };
 
         // Check if there are any existing reactions from the same user
-        const existingReactionIndex = updatedMessage?.reactions?.findIndex(
+        const existingReactionIndex = updatedMessage.reactions.length ?  updatedMessage?.reactions?.findIndex(
           (r) => r.userId === userInfo.id
-        );
+        ):-1;
 
         let newReactions;
 
