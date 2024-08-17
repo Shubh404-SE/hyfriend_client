@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useStateProvider } from "@/context/StateContext";
 
-const ReactedMessage = ({ reactions }) => {
+const ReactedMessage = ({ reactions, setShowReactPopup }) => {
   const [{ userInfo, currentChatUser }] = useStateProvider();
   const [animatedReactions, setAnimatedReactions] = useState([]);
   const [animate, setAnimate] = useState(false);
@@ -26,6 +26,7 @@ const ReactedMessage = ({ reactions }) => {
             className={` bg-panel-header-background rounded-full flex items-center justify-center shadow-md transform transition-transform duration-200 ease-in-out emoji-3d hover:scale-110 ${
               animate ? "animate-reaction" : ""
             }`}
+            onClick={()=>setShowReactPopup(true)}
           >
             <span className="text-lg">{reaction.reaction}</span>
           </div>

@@ -22,6 +22,7 @@ import ReplyedMessage from "./ReplyedMessage";
 import axios from "axios";
 import { ADD_MESSAGE_REACT_ROUTE } from "@/utils/ApiRoutes";
 import ReactedMessage from "./ReactedMessage";
+import ReactDetails from "./Popups/ReactDetails";
 
 const MessageBox = ({ message, index }) => {
   const [{ currentChatUser, userInfo }, dispatch] = useStateProvider();
@@ -29,6 +30,7 @@ const MessageBox = ({ message, index }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [showReactPopup, setShowReactPopup] = useState(false);
   const [showInfoPopup, setShowInfoPopup] = useState(false);
+  const [showReactDetailsPopup, setShowReactDetailsPopup] = useState(false);
   const [updatedMessage, setUpdatedMessage] = useState(message);
   const self = message?.senderId === currentChatUser?.id;
 
@@ -60,9 +62,11 @@ const MessageBox = ({ message, index }) => {
         const newReaction = { userId: userInfo.id, reaction: emoji };
 
         // Check if there are any existing reactions from the same user
-        const existingReactionIndex = updatedMessage.reactions.length ?  updatedMessage?.reactions?.findIndex(
-          (r) => r.userId === userInfo.id
-        ):-1;
+        const existingReactionIndex = updatedMessage.reactions.length
+          ? updatedMessage?.reactions?.findIndex(
+              (r) => r.userId === userInfo.id
+            )
+          : -1;
 
         let newReactions;
 
@@ -148,10 +152,25 @@ const MessageBox = ({ message, index }) => {
         )}
         {message.type === "audio" && <VoiceMessage message={message} />}
         {updatedMessage?.reactions?.length &&
-          updatedMessage?.reactions[0]?.userId && (
-            <ReactedMessage reactions={updatedMessage.reactions} />
-          )}
+        updatedMessage?.reactions[0]?.userId ? (
+          <ReactedMessage
+            reactions={updatedMessage.reactions}
+            setShowReactPopup={setShowReactDetailsPopup}
+          />
+        ) : (
+          <></>
+        )}
       </div>
+      {showReactDetailsPopup && (
+        <ReactDetails
+          onHide={() => setShowReactDetailsPopup(false)}
+          className="React Details"
+          noHeader={true}
+          shortHeight={true}
+          self={self}
+          message={updatedMessage}
+        />
+      )}
       {showDeletePopup && (
         <DeleteMsgPopup
           onHide={() => setShowDeletePopup(false)}
