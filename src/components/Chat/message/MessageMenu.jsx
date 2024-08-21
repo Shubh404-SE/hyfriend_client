@@ -40,18 +40,17 @@ const MessageMenu = ({ showMenu, message, setShowMenu, self, options }) => {
             }
 
             return (
-              <>
+              <div key={index}>
                 {selfShow && (
                   <li
                     className="flex items-center gap-4 py-3 px-5 hover:bg-dropdown-background-hover cursor-pointer"
-                    key={index}
                     onClick={(e) => handleClick(e, callback)}
                   >
                     <div className="text-xl text-icon-lighter">{Icon}</div>
                     <span className="text-sm text-white">{name}</span>
                   </li>
                 )}
-              </>
+              </div>
             );
           })}
         </ul>

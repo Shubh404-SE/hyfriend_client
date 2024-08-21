@@ -20,6 +20,7 @@ import {
   SET_MESSAGES,
   SET_NOT_TYPING,
   SET_ONLINE_USERS,
+  SET_REACTION,
   SET_SOCKET,
   SET_USER_INFO,
   UPDATE_MESSAGE_STATUS,
@@ -42,8 +43,6 @@ function Main() {
       userInfo,
       currentChatUser,
       messagesSearch,
-      userContacts,
-      isOnSameChat,
       profilePage,
       voiceCall,
       incomingVoiceCall,
@@ -209,6 +208,38 @@ function Main() {
             <div>
               <strong>New message from {data.from}</strong>
               <p>{data.message.message}</p>
+            </div>,
+            {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+          playNotificationSound(); // play notification sound.
+        }
+      });
+
+      // need to fix this reaction in real time.........................
+      socket.current.on("react-msg-recieve", (data) => {
+ 
+        const chatUser = currentChatUserRef.current;
+        if (chatUser?.id === data.userId) {
+          // receiver and sender are at each others chat.
+
+          dispatch({
+            type: SET_REACTION,
+            reaction: data,
+          });
+        } else if (chatUser?.id !== data.userId || !chatUser) {
+          // Optionally handle the case where the message is for a different user
+          toast.info(
+            <div className="flex items-center gap-3">
+              <p className="text-xl">{emoji}</p>
+              <strong>{data.from} user reacted on a message.</strong>
             </div>,
             {
               position: "top-right",

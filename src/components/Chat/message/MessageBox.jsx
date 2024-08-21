@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TextMessage from "./TextMessage";
 import ImageMessage from "./ImageMessage";
 import dynamic from "next/dynamic";
@@ -25,7 +25,8 @@ import ReactedMessage from "./ReactedMessage";
 import ReactDetails from "../Popups/ReactDetails";
 
 const MessageBox = ({ message, index }) => {
-  const [{ currentChatUser, userInfo }, dispatch] = useStateProvider();
+  const [{ currentChatUser, userInfo, isOnSameChat, socket }, dispatch] =
+    useStateProvider();
   const [showMenu, setShowMenu] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [showReactPopup, setShowReactPopup] = useState(false);
@@ -33,6 +34,10 @@ const MessageBox = ({ message, index }) => {
   const [showReactDetailsPopup, setShowReactDetailsPopup] = useState(false);
   const [updatedMessage, setUpdatedMessage] = useState(message);
   const self = message?.senderId === currentChatUser?.id;
+
+  useEffect(()=>{
+    setUpdatedMessage(message); 
+  }, [message]);
 
   const handleCopyMessage = () => {
     const messageText = message.message;
@@ -60,13 +65,12 @@ const MessageBox = ({ message, index }) => {
 
       if (response.status === 201) {
         const newReaction = { userId: userInfo.id, reaction: emoji };
+        const reactions = updatedMessage?.reactions || [];
 
         // Check if there are any existing reactions from the same user
-        const existingReactionIndex = (updatedMessage?.reactions && updatedMessage?.reactions?.length)
-          ? updatedMessage?.reactions?.findIndex(
-              (r) => r.userId === userInfo.id
-            )
-          : -1;
+        const existingReactionIndex = reactions.findIndex(
+          (r) => r.userId === userInfo.id
+        );
 
         let newReactions;
 
@@ -87,6 +91,18 @@ const MessageBox = ({ message, index }) => {
 
         // Update the message state
         setUpdatedMessage(newMessage);
+
+        if (isOnSameChat) {
+          // send socket for reaction
+          socket.current.emit("send-react-message", {
+            contactId: currentChatUser.id,
+            newReaction: {
+              userId: userInfo.id,
+              messageId: message.id,
+              reaction: emoji,
+            },
+          });
+        }
       }
     } catch (err) {
       console.log(err);

@@ -212,6 +212,7 @@ function MessageBar() {
         if (replyingToMessage) {
           data.message.repliedmessage = replyingToMessage.text;
         }
+        data.message.reactions = [];
 
         dispatch({
           type: REPLY_TO_MESSAGE,

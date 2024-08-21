@@ -16,6 +16,7 @@ import {
   SET_NOT_TYPING,
   SET_ONLINE_USERS,
   SET_PROFILE_PAGE,
+  SET_REACTION,
   SET_SOCKET,
   SET_USER_CONTACTS,
   SET_USER_INFO,
@@ -34,7 +35,7 @@ export const initialState = {
   currentChatUser: undefined,
   isOnSameChat: false,
   messages: [],
-  replyingToMessage:undefined,
+  replyingToMessage: undefined,
   socket: undefined,
   messagesSearch: false,
   userContacts: [],
@@ -98,15 +99,48 @@ const reducer = (state, action) => {
         messages: [...state.messages, action.newMessage],
       };
     case REPLY_TO_MESSAGE:
-      return{
+      return {
         ...state,
         replyingToMessage: action.data,
-      }
+      };
     case SET_MESSAGE_SEARCH:
       return {
         ...state,
         messagesSearch: !state.messagesSearch,
       };
+    case SET_REACTION: {
+      const newReaction = action.reaction;
+      const updatedMessages = state.messages.map((message) => {
+        if (message.id === newReaction.messageId) {
+          const reactions = message.reactions || [];
+
+          const existingReactionIndex = reactions.findIndex(
+            (r) => r.userId === newReaction.userId
+          );
+
+          let updatedReactions;
+          if (existingReactionIndex !== -1) {
+            // Update existing reaction
+            updatedReactions = [...message.reactions];
+            updatedReactions[existingReactionIndex] = newReaction;
+          } else {
+            // Add new reaction
+            updatedReactions = [newReaction, ...message.reactions];
+          }
+
+          return {
+            ...message,
+            reactions: updatedReactions,
+          };
+        }
+        return message;
+      });
+      // console.log(updatedMessages);
+      return {
+        ...state,
+        messages: updatedMessages,
+      };
+    }
     case SET_USER_CONTACTS:
       return {
         ...state,

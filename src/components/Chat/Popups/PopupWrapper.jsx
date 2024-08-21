@@ -15,7 +15,8 @@ const PopupWrapper = (props) => {
       <div
         className={`relative z-10 flex flex-col items-center max-h-[80%] ml-[20%] m-2 ${
           props.shortHeight ? "" : "min-h-[600px]"
-        }`}
+        } `}
+        style={{ animation: "popup 0.3s ease-out forwards" }}
       >
         <div
           className={`absolute transform ${
@@ -23,11 +24,11 @@ const PopupWrapper = (props) => {
           } -translate-y-full -top-2`}
         >
           {props.message.type === "text" && (
-              <TextMessage message={props.message} preview={true} />
+            <TextMessage message={props.message} preview={true} />
           )}
 
           {props.message.type === "image" && (
-              <ImageMessage message={props.message} index={1} preview={true} />
+            <ImageMessage message={props.message} index={1} preview={true} />
           )}
 
           {props.message.type === "audio" && (
