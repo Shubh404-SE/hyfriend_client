@@ -27,6 +27,15 @@ const UserProfile = () => {
       : currentChatUser.profilePicture
   );
 
+  const [prevData, setPrevData] = useState({
+    name: profilePage === "user" ? userInfo.name : currentChatUser.name,
+    about: profilePage === "user" ? userInfo.status : currentChatUser.about,
+    imgUrl:
+      profilePage === "user"
+        ? userInfo.profileImage
+        : currentChatUser.profilePicture,
+  });
+
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -190,7 +199,12 @@ const UserProfile = () => {
                   </button>
                   <button
                     className="block w-full max-w-xs mx-auto bg-teal-light hover:bg-indigo-900 focus:bg-indigo-700 text-white rounded-lg px-3 py-3 font-semibold"
-                    onClick={() => setIsEditProfile(false)}
+                    onClick={() => {
+                      setIsEditProfile(false);
+                      setAbout(prevData.about);
+                      setImg(prevData.imgUrl);
+                      setName(prevData.name);
+                    }}
                   >
                     Discard
                   </button>
