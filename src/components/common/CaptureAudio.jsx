@@ -103,7 +103,7 @@ function CaptureAudio({ hide }) {
         });
 
         if(isOnSameChat){
-          const newMessage = {...responce.data.message, messageStatus: 'read' };
+          const newMessage = {...responce.data.message, messageStatus: 'read',seenAt: new Date() };
           const newData = { ...responce.data, message:newMessage};
           dispatch({
             type:UPDATE_USER_CONTACTS_ON_SEND,

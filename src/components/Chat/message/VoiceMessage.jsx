@@ -3,7 +3,7 @@ import { HOST } from "@/utils/ApiRoutes";
 import React, { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 import { FaPlay, FaStop } from "react-icons/fa";
-import { calculateTime } from "@/utils/CalculateTime";
+import { calculateTime, formateDate } from "@/utils/CalculateTime";
 import MessageStatus from "../../common/MessageStatus";
 import Avatar from "@/components/common/Avatar";
 
@@ -117,7 +117,7 @@ function VoiceMessage({ message }) {
             {formatTime(isPlaying ? currentPlaybackTime : totalDuration)}
           </span>
           <div className="flex gap-1">
-            <span>{calculateTime(message.createdAt)}</span>
+            <span>{formateDate(message.createdAt)}</span>
             {message.senderId === userInfo.id && (
               <MessageStatus messageStatus={message.messageStatus} />
             )}

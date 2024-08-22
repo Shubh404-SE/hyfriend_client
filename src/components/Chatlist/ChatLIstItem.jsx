@@ -7,7 +7,7 @@ import {
   SET_ALL_CONTACTS_PAGE,
   SET_USER_CONTACTS,
 } from "@/context/constants";
-import { calculateTime } from "@/utils/CalculateTime";
+import { calculateTime, formateDate } from "@/utils/CalculateTime";
 import MessageStatus from "../common/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
 
@@ -108,7 +108,7 @@ function ChatListItem({ data, isContactPage }) {
                     : "text-icon-blue"
                 } text-sm`}
               >
-                {calculateTime(data.createdAt)}
+                {formateDate(data.createdAt)}
               </span>
             </div>
           )}

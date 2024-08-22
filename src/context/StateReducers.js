@@ -34,7 +34,7 @@ export const initialState = {
   profilePage: undefined,
   currentChatUser: undefined,
   isOnSameChat: false,
-  messages: [],
+  messages: {},
   replyingToMessage: undefined,
   socket: undefined,
   messagesSearch: false,
@@ -83,11 +83,16 @@ const reducer = (state, action) => {
         ...state,
         isOnSameChat: action.status,
       };
-    case SET_MESSAGES:
+    case SET_MESSAGES: {
+      const messagesObject = action.messages.reduce((acc, message) => {
+        acc[message.id] = message; // Use the message id as the key
+        return acc;
+      }, {});
       return {
         ...state,
-        messages: action.messages,
+        messages: messagesObject,
       };
+    }
     case SET_SOCKET:
       return {
         ...state,
@@ -96,7 +101,10 @@ const reducer = (state, action) => {
     case ADD_MESSAGE:
       return {
         ...state,
-        messages: [...state.messages, action.newMessage],
+        messages: {
+          ...state.messages,
+          [action.newMessage.id]: action.newMessage,
+        },
       };
     case REPLY_TO_MESSAGE:
       return {
@@ -110,37 +118,43 @@ const reducer = (state, action) => {
       };
     case SET_REACTION: {
       const newReaction = action.reaction;
-      const updatedMessages = state.messages.map((message) => {
-        if (message.id === newReaction.messageId) {
-          const reactions = message.reactions || [];
+      const messageId = newReaction.messageId;
 
-          const existingReactionIndex = reactions.findIndex(
-            (r) => r.userId === newReaction.userId
-          );
+      // Retrieve the message to update
+      const messageToUpdate = state.messages[messageId];
 
-          let updatedReactions;
-          if (existingReactionIndex !== -1) {
-            // Update existing reaction
-            updatedReactions = [...message.reactions];
-            updatedReactions[existingReactionIndex] = newReaction;
-          } else {
-            // Add new reaction
-            updatedReactions = [newReaction, ...message.reactions];
-          }
+      if (messageToUpdate) {
+        const reactions = messageToUpdate.reactions || [];
 
-          return {
-            ...message,
-            reactions: updatedReactions,
-          };
+        const existingReactionIndex = reactions.findIndex(
+          (r) => r.userId === newReaction.userId
+        );
+
+        let updatedReactions;
+        if (existingReactionIndex !== -1) {
+          updatedReactions = [...reactions];
+          updatedReactions[existingReactionIndex] = newReaction;
+        } else {
+          updatedReactions = [newReaction, ...reactions];
         }
-        return message;
-      });
-      // console.log(updatedMessages);
-      return {
-        ...state,
-        messages: updatedMessages,
-      };
+
+        const updatedMessage = {
+          ...messageToUpdate,
+          reactions: updatedReactions,
+        };
+
+        return {
+          ...state,
+          messages: {
+            ...state.messages,
+            [messageId]: updatedMessage,
+          },
+        };
+      }
+
+      return state;
     }
+
     case SET_USER_CONTACTS:
       return {
         ...state,
@@ -234,24 +248,34 @@ const reducer = (state, action) => {
       });
 
       if (state.isOnSameChat) {
-        const updatedMessages = state.messages.map((message) => {
-          if (
-            message.senderId === contactId &&
-            message.recieverId === userId &&
-            message.messageStatus !== "read"
-          ) {
-            return {
-              ...message,
-              messageStatus: "read",
-            };
-          } else {
-            return message;
-          }
-        });
+        const updatedMessages = Object.keys(state.messages).reduce(
+          (acc, messageId) => {
+            const message = state.messages[messageId];
+
+            if (
+              message.senderId === contactId &&
+              message.recieverId === userId &&
+              message.messageStatus !== "read"
+            ) {
+              // Update message status to "read"
+              acc[messageId] = {
+                ...message,
+                messageStatus: "read",
+                seenAt: new Date(),
+              };
+            } else {
+              // Keep the message unchanged
+              acc[messageId] = message;
+            }
+
+            return acc;
+          },
+          {}
+        );
 
         return {
           ...state,
-          userContacts: updatedContacts,
+          userContacts: updatedContacts, // Ensure updatedContacts is defined elsewhere
           messages: updatedMessages,
         };
       }

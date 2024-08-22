@@ -1,6 +1,6 @@
 import { SET_MESSAGE_SEARCH } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
-import { calculateTime } from "@/utils/CalculateTime";
+import { calculateTime, formateDate } from "@/utils/CalculateTime";
 import React, { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import { IoClose } from "react-icons/io5";
@@ -12,7 +12,7 @@ function SearchMessages() {
 
   useEffect(()=>{
     if(searchTerm){
-      setSearchedMessages(messages.filter(message => message.type ==="text" && message.message.includes(searchTerm)))
+      setSearchedMessages(Object.values(messages).filter(message => message.type ==="text" && message.message.includes(searchTerm)))
     }
     else{
       setSearchedMessages([]);
@@ -64,7 +64,7 @@ function SearchMessages() {
                 return(
                   <div key={message.id} className=" flex cursor-pointer flex-col justify-center hover:bg-background-default-hover w-full px-5 border-b-[0.5px] border-secondary py-5">
                     <div className="text-sm text-secondary">
-                      {calculateTime(message.createdAt)}
+                      {formateDate(message.createdAt)}
                     </div>
                     <div className="text-icon-blue">
                       {message.message}

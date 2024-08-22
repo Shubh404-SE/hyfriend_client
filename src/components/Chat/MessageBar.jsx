@@ -159,6 +159,7 @@ function MessageBar() {
           const newMessage = {
             ...response.data.message,
             messageStatus: "read",
+            seenAt: new Date(),
           };
           const newData = { ...response.data, message: newMessage };
           dispatch({
@@ -225,7 +226,7 @@ function MessageBar() {
         });
 
         if (isOnSameChat) {
-          const newMessage = { ...data.message, messageStatus: "read" };
+          const newMessage = { ...data.message, messageStatus: "read",seenAt: new Date(), };
           const newData = { ...data, message: newMessage };
           dispatch({
             type: UPDATE_USER_CONTACTS_ON_SEND,

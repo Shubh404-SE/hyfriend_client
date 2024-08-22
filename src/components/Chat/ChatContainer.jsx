@@ -7,17 +7,23 @@ import MessageBox from "./message/MessageBox";
 function ChatContainer() {
   const [{ messages, currentChatUser, userInfo }] = useStateProvider();
   const ref = useRef();
+  const [prevMessagesLength, setPrevMessagesLength] = useState(Object.keys(messages).length);
 
   useEffect(() => {
     const scrollToBottom = () => {
-      const chatcontainer = ref.current;
-      chatcontainer.scrollTop = chatcontainer.scrollHeight;
+      const chatContainer = ref.current;
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
     };
+    if (Object.keys(messages).length > prevMessagesLength) {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 0);
+    }
 
-    setTimeout(() => {
-      scrollToBottom();
-    }, 0);
-  }, [currentChatUser, userInfo, messages]);
+    setPrevMessagesLength(Object.keys(messages).length);
+  }, [messages, currentChatUser, userInfo]);
 
 
   return (
@@ -37,7 +43,7 @@ function ChatContainer() {
             }
           >
             <div className="grow  flex flex-col gap-1">
-              {messages.map((message, index) => (
+              {Object.values(messages).map((message, index) => (
                 <div
                   key={message.id}
                   className={`flex ${

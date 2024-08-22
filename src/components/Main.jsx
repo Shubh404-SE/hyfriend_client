@@ -225,7 +225,6 @@ function Main() {
 
       // need to fix this reaction in real time.........................
       socket.current.on("react-msg-recieve", (data) => {
- 
         const chatUser = currentChatUserRef.current;
         if (chatUser?.id === data.userId) {
           // receiver and sender are at each others chat.

@@ -1,6 +1,6 @@
 import { useStateProvider } from "@/context/StateContext";
 import { HOST } from "@/utils/ApiRoutes";
-import { calculateTime } from "@/utils/CalculateTime";
+import { calculateTime, formateDate } from "@/utils/CalculateTime";
 import Image from "next/image";
 import React from "react";
 import MessageStatus from "../../common/MessageStatus";
@@ -31,7 +31,7 @@ function ImageMessage({ message, index, preview }) {
             </PhotoView>
             <div className=" absolute bottom-1 right-1 flex items-end gap-1">
               <span className=" text-bubble-meta text-[11px] pt-1 min-w-fit">
-                {calculateTime(message.createdAt)}
+                {formateDate(message.createdAt)}
               </span>
               <span className=" text-bubble-meta">
                 <span className=" text-bubble-meta">
@@ -65,7 +65,7 @@ function ImageMessage({ message, index, preview }) {
             </div>
             <div className="absolute bottom-1 right-1 flex items-end gap-1">
               <span className="text-bubble-meta text-[11px] pt-1 min-w-fit">
-                {calculateTime(message.createdAt)}
+                {formateDate(message.createdAt)}
               </span>
               {message.senderId === userInfo.id && (
                 <span className="text-bubble-meta">

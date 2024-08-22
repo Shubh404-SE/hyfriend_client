@@ -17,7 +17,7 @@ import { useStateProvider } from "@/context/StateContext";
 import DeleteMsgPopup from "../Popups/DeleteMsgPopoup";
 import ReactMsgPopoup from "../Popups/ReactMsgPopoup";
 import InfoPopup from "../Popups/InfoPopup";
-import { REPLY_TO_MESSAGE } from "@/context/constants";
+import { REPLY_TO_MESSAGE, SET_REACTION } from "@/context/constants";
 import ReplyedMessage from "./ReplyedMessage";
 import axios from "axios";
 import { ADD_MESSAGE_REACT_ROUTE } from "@/utils/ApiRoutes";
@@ -64,33 +64,11 @@ const MessageBox = ({ message, index }) => {
       });
 
       if (response.status === 201) {
-        const newReaction = { userId: userInfo.id, reaction: emoji };
-        const reactions = updatedMessage?.reactions || [];
-
-        // Check if there are any existing reactions from the same user
-        const existingReactionIndex = reactions.findIndex(
-          (r) => r.userId === userInfo.id
-        );
-
-        let newReactions;
-
-        if (existingReactionIndex !== -1) {
-          // Update existing reaction if found
-          newReactions = [...updatedMessage.reactions];
-          newReactions[existingReactionIndex] = newReaction;
-        } else {
-          // Add new reaction to the array
-          newReactions = [newReaction, ...updatedMessage.reactions];
-        }
-
-        // Update the message with the new reactions array
-        const newMessage = {
-          ...updatedMessage,
-          reactions: newReactions,
-        };
-
-        // Update the message state
-        setUpdatedMessage(newMessage);
+        
+        dispatch({
+          type: SET_REACTION,
+          reaction: response.data.reaction,
+        });
 
         if (isOnSameChat) {
           // send socket for reaction
