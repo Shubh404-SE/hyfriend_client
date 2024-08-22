@@ -237,8 +237,8 @@ function Main() {
           // Optionally handle the case where the message is for a different user
           toast.info(
             <div className="flex items-center gap-3">
-              <p className="text-xl">{emoji}</p>
-              <strong>{data.from} user reacted on a message.</strong>
+              <strong className="text-xl">{data.reaction}</strong>
+              <p className="text-base">{data.name} reacted on a message.</p>
             </div>,
             {
               position: "top-right",

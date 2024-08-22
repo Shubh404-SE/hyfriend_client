@@ -35,8 +35,8 @@ const MessageBox = ({ message, index }) => {
   const [updatedMessage, setUpdatedMessage] = useState(message);
   const self = message?.senderId === currentChatUser?.id;
 
-  useEffect(()=>{
-    setUpdatedMessage(message); 
+  useEffect(() => {
+    setUpdatedMessage(message);
   }, [message]);
 
   const handleCopyMessage = () => {
@@ -64,23 +64,20 @@ const MessageBox = ({ message, index }) => {
       });
 
       if (response.status === 201) {
-        
         dispatch({
           type: SET_REACTION,
           reaction: response.data.reaction,
         });
 
-        if (isOnSameChat) {
-          // send socket for reaction
-          socket.current.emit("send-react-message", {
-            contactId: currentChatUser.id,
-            newReaction: {
-              userId: userInfo.id,
-              messageId: message.id,
-              reaction: emoji,
-            },
-          });
-        }
+        socket.current.emit("send-react-message", {
+          contactId: currentChatUser.id,
+          newReaction: {
+            userId: userInfo.id,
+            name: userInfo.name,
+            messageId: message.id,
+            reaction: emoji,
+          },
+        });
       }
     } catch (err) {
       console.log(err);

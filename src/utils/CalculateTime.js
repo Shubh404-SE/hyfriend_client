@@ -66,7 +66,6 @@ export const calculateTime = (inputDateStr) => {
 export const formateDate = (date) => {
   const inputDate = new Date(date);
     const now = new Date();
-    console.log(inputDate, now);
     const diff = now.getTime() - inputDate.getTime();
 
     if (diff < 60000) {
