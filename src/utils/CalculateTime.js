@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const calculateTime = (inputDateStr) => {
   // Assuming the input date string is in UTC format
   const inputDate = new Date(inputDateStr);
@@ -59,3 +61,25 @@ export const calculateTime = (inputDateStr) => {
     return formattedDate;
   }
 };
+
+
+export const formateDate = (date) => {
+  const inputDate = new Date(date);
+    const now = new Date();
+    const diff = now.getTime() - inputDate.getTime();
+
+    if (diff < 60000) {
+        return "now";
+    }
+
+    if (diff < 3600000) {
+        return `${Math.round(diff / 60000)} min ago`;
+    }
+
+    if (diff < 86400000) {
+        return moment(inputDate).format("h:mm A");
+    }
+
+    return moment(inputDate).format("MM/DD/YY");
+};
+

@@ -6,31 +6,36 @@ import React, { useEffect } from "react";
 import ChatLIstItem from "./ChatLIstItem";
 
 function List() {
-  const [{ userInfo, userContacts, filteredContacts }, dispatch] =
+  const [{ userInfo, userContacts, filteredContacts, refreshContacts }, dispatch] =
     useStateProvider();
 
-  useEffect(() => {
-    const getContacts = async () => {
-      try {
-        const {
-          data: { users, onlineUsers },
-        } = await axios.get(`${GET_INITIAL_CONTACTS_ROUTE}/${userInfo.id}`);
+  // get contact list...
+  const getContacts = async () => {
+    try {
+      const {
+        data: { users, onlineUsers },
+      } = await axios.get(`${GET_INITIAL_CONTACTS_ROUTE}/${userInfo.id}`);
 
-        dispatch({
-          type: SET_ONLINE_USERS,
-          onlineUsers,
-        });
-        dispatch({
-          type: SET_USER_CONTACTS,
-          userContacts: users,
-        });
-        // console.log(users, onlineUsers);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getContacts();
-  }, [userInfo]);
+      dispatch({
+        type: SET_ONLINE_USERS,
+        onlineUsers,
+      });
+      dispatch({
+        type: SET_USER_CONTACTS,
+        userContacts: users,
+      });
+      // console.log(users, onlineUsers);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    if (userInfo?.id) {
+      getContacts();
+    }
+  }, [userInfo, refreshContacts]);
+
   return (
     <div className=" bg-search-input-container-background flex-auto overflow-auto max-h-full custom-scrollbar">
       {filteredContacts && filteredContacts.length > 0

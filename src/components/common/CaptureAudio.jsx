@@ -1,4 +1,4 @@
-import { ADD_MESSAGE } from "@/context/constants";
+import { ADD_MESSAGE, UPDATE_USER_CONTACTS_ON_SEND } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
 import { ADD_AUDIO_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
@@ -15,7 +15,7 @@ import WaveSurfer from "wavesurfer.js";
 // import { MediaRecorder } from "zego-express-engine-webrtc/sdk/src/common/zego.entity"; --- giving error
 
 function CaptureAudio({ hide }) {
-  const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser, isOnSameChat, socket }, dispatch] = useStateProvider();
 
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -67,6 +67,19 @@ function CaptureAudio({ hide }) {
     if(waveForm) handleStartRecording();
   }, [waveForm]);
 
+  useEffect(() => {
+    const handleEnterKeyPress = (event) => {
+      if (event.key === "Enter") {
+        sendRecording();
+      }
+    };
+
+    document.addEventListener("keydown", handleEnterKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleEnterKeyPress);
+    };
+  }, [renderedAudio]);
 
   const sendRecording = async () => {
     try {
@@ -89,13 +102,34 @@ function CaptureAudio({ hide }) {
           message: responce.data.message,
         });
 
-        dispatch({
-          type: ADD_MESSAGE,
-          newMessage: {
-            ...responce.data.message,
-          },
-          fromSelf: true,
-        });
+        if(isOnSameChat){
+          const newMessage = {...responce.data.message, messageStatus: 'read',seenAt: new Date() };
+          const newData = { ...responce.data, message:newMessage};
+          dispatch({
+            type:UPDATE_USER_CONTACTS_ON_SEND,
+            data: newData,
+          });
+
+          dispatch({
+            type: ADD_MESSAGE,
+            newMessage,
+            fromSelf: true,
+          });
+        }else{
+          dispatch({
+            type:UPDATE_USER_CONTACTS_ON_SEND,
+            data:responce.data
+          });
+  
+          dispatch({
+            type: ADD_MESSAGE,
+            newMessage: {
+              ...responce.data.message,
+            },
+            fromSelf: true,
+          });
+        }
+
         hide(false);
       }
     }catch (err) {

@@ -6,31 +6,39 @@ import { BiSearchAlt2 } from "react-icons/bi";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useStateProvider } from "@/context/StateContext";
 import {
+  REPLY_TO_MESSAGE,
   SET_EXIT_CHAT,
   SET_MESSAGE_SEARCH,
+  SET_PROFILE_PAGE,
   SET_VIDEO_CALL,
   SET_VOICE_CALL,
 } from "@/context/constants";
 import ContextMenu from "../common/ContextMenu";
 
 function ChatHeader() {
-  const [{ currentChatUser, userInfo, onlineUsers }, dispatch] = useStateProvider();
+  const [{ currentChatUser, userInfo, onlineUsers, socket }, dispatch] =
+    useStateProvider();
   const [isContextMenue, setIsContextMenue] = useState(false);
-  const [contextMenueCordinates, setContextMenueCordinates] = useState({
-    x: 0,
-    y: 0,
-  });
+  
 
   const showContextMenue = (e) => {
     e.preventDefault();
     setIsContextMenue(true);
-    setContextMenueCordinates({ x: e.pageX -50, y: e.pageY +26 });
   };
 
   const contextMenuOptions = [
     {
       name: "Exit",
       callback: async () => {
+        socket.current.emit("change-chat", {
+          userId: userInfo.id,
+          previousContactId: currentChatUser?.id,
+          newContactId: null,
+        });
+        dispatch({
+          type:REPLY_TO_MESSAGE,
+          data:undefined,
+        });
         dispatch({ type: SET_EXIT_CHAT });
       },
     },
@@ -61,8 +69,13 @@ function ChatHeader() {
   };
 
   return (
-    <div className=" h-16 px-4 py-3 flex justify-between items-center bg-panel-header-background z-10">
-      <div className=" flex items-center justify-center gap-6">
+    <div className=" h-16 px-4 py-3 flex gap-2 items-center bg-panel-header-background z-10">
+      <div
+        className=" flex items-center justify-center gap-6 cursor-pointer"
+        onClick={() => {
+          dispatch({ type: SET_PROFILE_PAGE, pageType: "chatuser" });
+        }}
+      >
         <Avatar
           type="sm"
           image={`${
@@ -74,39 +87,45 @@ function ChatHeader() {
         <div className="flex flex-col">
           <span className="text-primary-strong">{currentChatUser?.name}</span>
           <span className="text-secondary text-sm">
-            {
-              onlineUsers.includes(currentChatUser.id) ? "online":"offline"
-            }
+            {onlineUsers.includes(currentChatUser.id) ? "online" : "offline"}
           </span>
         </div>
       </div>
-      <div className="flex gap-6">
-        <MdCall
+      <div className="flex items-center justify-center gap-3 ml-auto">
+        <div
+          className="text-panel-header-icon cursor-pointer text-xl hover:bg-conversation-panel-background rounded-full p-2"
           onClick={handleVoiceCall}
-          className=" text-panel-header-icon cursor-pointer text-xl"
-        />
-        <IoVideocam
+        >
+          <MdCall title="Voice Call" />
+        </div>
+        <div
+          className="text-panel-header-icon cursor-pointer text-xl hover:bg-conversation-panel-background rounded-full p-2 "
           onClick={handleVideoCall}
-          className=" text-panel-header-icon cursor-pointer text-xl"
-        />
-        <BiSearchAlt2
-          className=" text-panel-header-icon cursor-pointer text-xl"
+        >
+          <IoVideocam title="Video Call" />
+        </div>
+        <div
+          className="text-panel-header-icon cursor-pointer text-xl hover:bg-conversation-panel-background rounded-full p-2 "
           onClick={() => dispatch({ type: SET_MESSAGE_SEARCH })}
-        />
-
-        <BsThreeDotsVertical
-          onClick={(e) => showContextMenue(e)}
-          id="context_opener"
-          className=" text-panel-header-icon cursor-pointer text-xl"
-        />
-        {isContextMenue && (
-          <ContextMenu
-            options={contextMenuOptions}
-            cordinates={contextMenueCordinates}
-            contextMenu={isContextMenue}
-            setContextMenu={setIsContextMenue}
-          />
-        )}
+        >
+          <BiSearchAlt2 title="Search Message" />
+        </div>
+        <div className=" relative">
+          <div
+            className="text-panel-header-icon cursor-pointer text-xl hover:bg-conversation-panel-background rounded-full p-2"
+            onClick={(e) => showContextMenue(e)}
+            id="context_opener"
+          >
+            <BsThreeDotsVertical  id="context_opener" title="Options" />
+          </div>
+          {isContextMenue && (
+            <ContextMenu
+              options={contextMenuOptions}
+              contextMenu={isContextMenue}
+              setContextMenu={setIsContextMenue}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

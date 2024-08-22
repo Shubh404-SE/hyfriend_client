@@ -10,6 +10,7 @@ import { ONBOARD_USER_ROUTE } from "@/utils/ApiRoutes";
 import { useStateProvider } from "@/context/StateContext";
 
 import { SET_NEW_USER, SET_USER_INFO } from "@/context/constants";
+import Loader from "@/components/common/Loader";
 
 function onboarding() {
   const router = useRouter();
@@ -19,15 +20,17 @@ function onboarding() {
   const [imgUrl, setImg] = useState(
     userInfo ? userInfo.profileImage : "/default_avatar.png"
   );
+  const [isLoading, setIsLoading ] = useState(false);
 
 
   useEffect(()=>{
     if(!newUser && !userInfo?.email) router.push('/login');
-    else if(!newUser && userInfo?.email) router.push('/');
+    else if(!newUser && userInfo?.id) router.push('/');
   }, [newUser, userInfo, router]);
 
   const onboardingHandler = async()=>{
     if(validateDetailes()){
+      setIsLoading(true);
       const email = userInfo.email;
       try{
         const {data} = await axios.post(ONBOARD_USER_ROUTE, {
@@ -36,6 +39,9 @@ function onboarding() {
           about,
           imgUrl
         });
+
+
+        setIsLoading(false);
 
         if(data.status){
           dispatch({
@@ -48,13 +54,14 @@ function onboarding() {
               name,
               email,
               profileImage:imgUrl,
-              status:about,
+              status:data.data.about,
             }
           })
           router.push('/');
         }
       }catch(err){
         console.log(err);
+        setIsLoading(false);
       }
     }
   }
@@ -66,6 +73,7 @@ function onboarding() {
 
   return (
     <div className="bg-conversation-panel-background h-fit md:h-[100vh] w-full flex items-center justify-center p-2">
+      {isLoading && <Loader />}
       <div className="flex items-center flex-col p-2 m-2 w-full  shadow-teal-light rounded-md">
         <Image src="/logo.png" alt="logo img" width={150} height={150} />
         <div className="text-center text-teal-light">
