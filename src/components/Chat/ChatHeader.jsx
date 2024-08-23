@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Avatar from "../common/Avatar";
-import { MdCall } from "react-icons/md";
+import { MdArrowBack, MdCall } from "react-icons/md";
 import { IoVideocam } from "react-icons/io5";
 import { BiSearchAlt2 } from "react-icons/bi";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -12,6 +12,7 @@ import {
   SET_PROFILE_PAGE,
   SET_VIDEO_CALL,
   SET_VOICE_CALL,
+  SHOW_CHATLIST,
 } from "@/context/constants";
 import ContextMenu from "../common/ContextMenu";
 
@@ -70,6 +71,9 @@ function ChatHeader() {
 
   return (
     <div className=" h-16 px-4 py-3 flex gap-2 items-center bg-panel-header-background z-10">
+      <div className="py-2 text-xl cursor-pointer hover:scale-110 duration-200 transition-all" onClick={()=> dispatch({type: SHOW_CHATLIST})}>
+      <MdArrowBack className="text-icon-lighter" />
+      </div>
       <div
         className=" flex items-center justify-center gap-6 cursor-pointer"
         onClick={() => {

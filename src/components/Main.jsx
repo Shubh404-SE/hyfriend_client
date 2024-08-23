@@ -40,6 +40,7 @@ function Main() {
   const router = useRouter();
   const [
     {
+      showChatList,
       userInfo,
       currentChatUser,
       messagesSearch,
@@ -58,6 +59,19 @@ function Main() {
   // const [redirectLogin, setRedirectLogin] = useState(false);
   const [socketEvent, setSocketEvent] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 600 : false
+  ); /// for mobile view
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 600);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const chatUser = localStorage.getItem("currentChatUser");
@@ -375,22 +389,46 @@ function Main() {
         </div>
       )}
       {!videoCall && !voiceCall && (
-        <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full overflow-hidden">
-          <ChatList />
-          {currentChatUser ? (
-            <div
-              className={`${
-                messagesSearch || profilePage === "chatuser"
-                  ? "grid grid-cols-2"
-                  : "grid-cols-2"
-              }`}
-            >
-              <Chat />
-              {messagesSearch && <SearchMessages />}
-              {profilePage === "chatuser" && <UserProfile />}
-            </div>
-          ) : (
-            <Empty />
+        <div className={`grid ${isMobileView ? "":"grid-cols-main"} h-screen w-screen max-h-screen max-w-full overflow-hidden`}>
+          
+          {/* small display */}
+          {isMobileView && showChatList && <ChatList />}
+          { isMobileView && !showChatList &&
+            <>
+              {currentChatUser ? (
+                <div
+                  className={`grid`}
+                >
+                 {(!messagesSearch && profilePage !== "chatuser") &&  <Chat />}
+                  {messagesSearch && <SearchMessages />}
+                  {profilePage === "chatuser" && <UserProfile />}
+                </div>
+              ) : (
+                <Empty />
+              )}
+            </>
+          }
+
+          {/* for large display */}
+          {!isMobileView && (
+            <>
+              <ChatList />
+              {currentChatUser ? (
+                <div
+                  className={`${
+                    messagesSearch || profilePage === "chatuser"
+                      ? "grid grid-cols-2"
+                      : "grid-cols-2"
+                  }`}
+                >
+                  <Chat />
+                  {messagesSearch && <SearchMessages />}
+                  {profilePage === "chatuser" && <UserProfile />}
+                </div>
+              ) : (
+                <Empty />
+              )}
+            </>
           )}
         </div>
       )}

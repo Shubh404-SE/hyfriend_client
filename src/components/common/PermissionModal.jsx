@@ -2,9 +2,9 @@ import React from 'react'
 
 const PermissionModal = ({ onAllow, onDeny })=>{
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div className="bg-white p-4 rounded-md shadow-md">
-          <p>Do you allow notifications with sound?</p>
+          <p>Do you allow notifications sound?</p>
           <button onClick={onAllow} className="bg-blue-500 text-white p-2 rounded-md">
             Allow
           </button>

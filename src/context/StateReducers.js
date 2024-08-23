@@ -22,6 +22,7 @@ import {
   SET_USER_INFO,
   SET_VIDEO_CALL,
   SET_VOICE_CALL,
+  SHOW_CHATLIST,
   UPDATE_MESSAGE_STATUS,
   UPDATE_USER_CONTACTS_ON_RECEIVE,
   UPDATE_USER_CONTACTS_ON_SEND,
@@ -47,10 +48,16 @@ export const initialState = {
   voiceCall: undefined,
   incomingVoiceCall: undefined,
   incomingVideoCall: undefined,
+  showChatList : true,
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case SHOW_CHATLIST:
+      return{
+        ...state,
+        showChatList: !state.showChatList,
+      }
     case SET_USER_INFO:
       return {
         ...state,
