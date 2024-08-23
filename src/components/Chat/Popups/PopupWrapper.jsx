@@ -13,7 +13,7 @@ const PopupWrapper = (props) => {
       ></div>
 
       <div
-        className={`relative z-10 flex flex-col items-center max-h-[80%] ml-[20%] m-2 ${
+        className={`relative z-10 flex flex-col items-center max-h-[80%] m-2 ${
           props.shortHeight ? "" : "min-h-[600px]"
         } `}
         style={{ animation: "popup 0.3s ease-out forwards" }}
