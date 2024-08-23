@@ -17,10 +17,14 @@ import { useStateProvider } from "@/context/StateContext";
 import DeleteMsgPopup from "../Popups/DeleteMsgPopoup";
 import ReactMsgPopoup from "../Popups/ReactMsgPopoup";
 import InfoPopup from "../Popups/InfoPopup";
-import { REPLY_TO_MESSAGE, SET_REACTION } from "@/context/constants";
+import {
+  DELETE_MESSAGE,
+  REPLY_TO_MESSAGE,
+  SET_REACTION,
+} from "@/context/constants";
 import ReplyedMessage from "./ReplyedMessage";
 import axios from "axios";
-import { ADD_MESSAGE_REACT_ROUTE } from "@/utils/ApiRoutes";
+import { ADD_MESSAGE_REACT_ROUTE, DELETED_MSG } from "@/utils/ApiRoutes";
 import ReactedMessage from "./ReactedMessage";
 import ReactDetails from "../Popups/ReactDetails";
 
@@ -84,7 +88,41 @@ const MessageBox = ({ message, index }) => {
     }
   };
 
-  const deleteMesasge = (action) => {};
+  const deleteMesasge = async (action) => {
+    try {
+      const responce = await axios.post(DELETED_MSG, {
+        messageId: message.id,
+        userId: userInfo.id,
+        type: action,
+      });
+
+      if (responce.status === 200) {
+        toast.success(`${responce.data.message}`, {
+          autoClose: 1000,
+        });
+
+        dispatch({
+          type: DELETE_MESSAGE,
+          data: { messageId: message.id },
+        });
+
+        if(action === "DELETED_FOR_EVERYONE"){
+          socket.current.emit("delete-msg", {
+            contactId: currentChatUser.id,
+            messageId: message.id,
+            userId: userInfo.id,
+          })
+        }
+      }
+
+      setShowDeletePopup(false);
+    } catch (err) {
+      toast.error(err, {
+        autoClose: 1000,
+      });
+      setShowDeletePopup(false);
+    }
+  };
 
   const options = [
     {

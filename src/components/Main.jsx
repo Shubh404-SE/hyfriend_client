@@ -12,6 +12,7 @@ import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import {
   ADD_MESSAGE,
   CHANGE_CURRENT_CHAT_USER,
+  DELETE_MESSAGE,
   END_CALL,
   IS_ON_SAME_CHAT,
   SET_INCOMING_VIDEO_CALL,
@@ -155,17 +156,23 @@ function Main() {
   // getting messages of selected user
   useEffect(() => {
     const getMessages = async () => {
-      // console.log(userInfo.id, currentChatUser.id);
       const {
         data: { messages },
       } = await axios.get(
         `${GET_MESSAGES_ROUTE}/${userInfo.id}/${currentChatUser.id}`
       );
 
+      const filteredMessages = messages.filter((message) => {
+        const isDeletedForUser = message.deletedForUsers.includes(userInfo.id);
+        const isDeletedForEveryone = message.isDeletedForEveryone;
+        return !isDeletedForEveryone && !isDeletedForUser;
+      });
+
       dispatch({
         type: SET_MESSAGES,
-        messages,
+        messages:filteredMessages,
       });
+
     };
     if (currentChatUser?.id && userInfo?.id) {
       getMessages();
@@ -267,6 +274,13 @@ function Main() {
           playNotificationSound(); // play notification sound.
         }
       });
+
+      socket.current.on("msg-delete", ({messageId})=>{
+        dispatch({
+          type:DELETE_MESSAGE,
+          data:{messageId}
+        });
+      })
 
       socket.current.on("is-on-same-chat", ({ status }) => {
         dispatch({
