@@ -12,6 +12,7 @@ function logout() {
     socket.current.emit("signout", userInfo.id);
     socket.current.disconnect();
     dispatch({ type: SET_USER_INFO, userInfo: undefined });
+    localStorage.clear();
     signOut(firebaseAuth);
     router.push("/login");
   }, [socket]);

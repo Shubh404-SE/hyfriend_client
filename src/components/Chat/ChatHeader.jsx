@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "../common/Avatar";
 import { MdArrowBack, MdCall } from "react-icons/md";
 import { IoVideocam } from "react-icons/io5";
@@ -20,7 +20,19 @@ function ChatHeader() {
   const [{ currentChatUser, userInfo, onlineUsers, socket }, dispatch] =
     useStateProvider();
   const [isContextMenue, setIsContextMenue] = useState(false);
-  
+  const [isMobileView, setIsMobileView] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 600);
+    };
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const showContextMenue = (e) => {
     e.preventDefault();
@@ -37,8 +49,11 @@ function ChatHeader() {
           newContactId: null,
         });
         dispatch({
-          type:REPLY_TO_MESSAGE,
-          data:undefined,
+          type: REPLY_TO_MESSAGE,
+          data: undefined,
+        });
+        dispatch({
+          type: SHOW_CHATLIST,
         });
         dispatch({ type: SET_EXIT_CHAT });
       },
@@ -71,9 +86,15 @@ function ChatHeader() {
 
   return (
     <div className=" h-16 px-4 py-3 flex gap-2 items-center bg-panel-header-background z-10">
-      <div className="py-2 text-xl cursor-pointer hover:scale-110 duration-200 transition-all" onClick={()=> dispatch({type: SHOW_CHATLIST})}>
-      <MdArrowBack className="text-icon-lighter" />
-      </div>
+      {isMobileView && (
+        <div
+          className="py-2 text-xl cursor-pointer hover:scale-110 duration-200 transition-all"
+          onClick={() => dispatch({ type: SHOW_CHATLIST })}
+        >
+          <MdArrowBack className="text-icon-lighter" />
+        </div>
+      )}
+
       <div
         className=" flex items-center justify-center gap-6 cursor-pointer"
         onClick={() => {
@@ -120,7 +141,7 @@ function ChatHeader() {
             onClick={(e) => showContextMenue(e)}
             id="context_opener"
           >
-            <BsThreeDotsVertical  id="context_opener" title="Options" />
+            <BsThreeDotsVertical id="context_opener" title="Options" />
           </div>
           {isContextMenue && (
             <ContextMenu
