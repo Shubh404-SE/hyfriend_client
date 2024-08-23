@@ -26,3 +26,5 @@ export const SET_NOT_TYPING = "SET_NOT_TYPING";
 
 export const SET_EXIT_CHAT = "SET_EXIT_CHAT";
 
+
+export const SHOW_CHATLIST = "SHOW_CHATLIST";

@@ -6,6 +6,7 @@ import {
   REPLY_TO_MESSAGE,
   SET_ALL_CONTACTS_PAGE,
   SET_USER_CONTACTS,
+  SHOW_CHATLIST,
 } from "@/context/constants";
 import { calculateTime, formateDate } from "@/utils/CalculateTime";
 import MessageStatus from "../common/MessageStatus";
@@ -36,6 +37,11 @@ function ChatListItem({ data, isContactPage }) {
       type:REPLY_TO_MESSAGE,
       data:undefined,
     });
+
+    dispatch({
+      type: SHOW_CHATLIST,
+    });
+    
     if (!isContactPage) {
       // Update the current chat user in state
       dispatch({
