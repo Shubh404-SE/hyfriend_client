@@ -1,6 +1,7 @@
 import {
   ADD_MESSAGE,
   CHANGE_CURRENT_CHAT_USER,
+  DELETE_MESSAGE,
   END_CALL,
   IS_ON_SAME_CHAT,
   REPLY_TO_MESSAGE,
@@ -48,16 +49,16 @@ export const initialState = {
   voiceCall: undefined,
   incomingVoiceCall: undefined,
   incomingVideoCall: undefined,
-  showChatList : true,
+  showChatList: true,
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case SHOW_CHATLIST:
-      return{
+      return {
         ...state,
         showChatList: !state.showChatList,
-      }
+      };
     case SET_USER_INFO:
       return {
         ...state,
@@ -113,6 +114,22 @@ const reducer = (state, action) => {
           [action.newMessage.id]: action.newMessage,
         },
       };
+    // delete message
+    case DELETE_MESSAGE: {
+      const { messageId} = action.data;
+      const messageToDelete = state.messages[messageId];
+
+      if (!messageToDelete) {
+        return state;
+      }
+
+      const updatedMessages = { ...state.messages };
+      delete updatedMessages[messageId];
+      return {
+        ...state,
+        messages: updatedMessages,
+      };
+    }
     case REPLY_TO_MESSAGE:
       return {
         ...state,
