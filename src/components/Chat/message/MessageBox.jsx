@@ -66,7 +66,6 @@ const MessageBox = ({ message, index }) => {
         userId: userInfo.id,
         reaction: emoji,
       });
-
       if (response.status === 201) {
         dispatch({
           type: SET_REACTION,
@@ -85,6 +84,9 @@ const MessageBox = ({ message, index }) => {
       }
     } catch (err) {
       console.log(err);
+      toast.error(err, {
+        autoClose: 1000,
+      });
     }
   };
 
@@ -95,7 +97,6 @@ const MessageBox = ({ message, index }) => {
         userId: userInfo.id,
         type: action,
       });
-
       if (responce.status === 200) {
         toast.success(`${responce.data.message}`, {
           autoClose: 1000,
@@ -113,6 +114,11 @@ const MessageBox = ({ message, index }) => {
             userId: userInfo.id,
           })
         }
+      }
+      else{
+        toast.error(responce.data.error, {
+          autoClose:1000,
+        });
       }
 
       setShowDeletePopup(false);

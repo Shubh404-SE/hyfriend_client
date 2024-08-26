@@ -5,6 +5,8 @@ import { BsFillChatLeftTextFill, BsThreeDotsVertical } from "react-icons/bs";
 import { SET_ALL_CONTACTS_PAGE, SET_PROFILE_PAGE, SET_USER_INFO } from "@/context/constants";
 import ContextMenu from "../common/ContextMenu";
 import { useRouter } from "next/router";
+import { FaRegUserCircle } from "react-icons/fa";
+import { MdLogout } from "react-icons/md";
 
 function ChatListHeader() {
   const [{ userInfo, socket }, dispatch] = useStateProvider();
@@ -22,6 +24,7 @@ function ChatListHeader() {
 
   const contextMenuOptions = [
     {
+      Icon: <FaRegUserCircle />,
       name:"Profile",
       callback: ()=>{
         setIsContextMenue(false);
@@ -29,6 +32,7 @@ function ChatListHeader() {
       }
     },
     {
+      Icon: <MdLogout />,
       name: "Logout",
       callback: async () => {
         setIsContextMenue(false);

@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Avatar from "../common/Avatar";
-import { MdArrowBack, MdCall } from "react-icons/md";
+import {
+  MdArrowBack,
+  MdCall,
+  MdExitToApp,
+  MdOutlineAutoDelete,
+  MdOutlineDelete,
+} from "react-icons/md";
 import { IoVideocam } from "react-icons/io5";
 import { BiSearchAlt2 } from "react-icons/bi";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -41,7 +47,18 @@ function ChatHeader() {
 
   const contextMenuOptions = [
     {
-      name: "Exit",
+      Icon: <MdOutlineAutoDelete />,
+      name: "Clear Chat",
+      callback: () => {},
+    },
+    {
+      Icon: <MdOutlineDelete />,
+      name: "Delete Chat",
+      callback: () => {},
+    },
+    {
+      Icon: <MdExitToApp />,
+      name: "Exit Chat",
       callback: async () => {
         socket.current.emit("change-chat", {
           userId: userInfo.id,
@@ -84,12 +101,29 @@ function ChatHeader() {
     });
   };
 
+  const handleBack = () => {
+    dispatch({
+      type: REPLY_TO_MESSAGE,
+      data: undefined,
+    });
+    dispatch({
+      type: SHOW_CHATLIST,
+    });
+    dispatch({ type: SET_EXIT_CHAT });
+
+    socket.current.emit("change-chat", {
+      userId: userInfo.id,
+      previousContactId: currentChatUser?.id,
+      newContactId: null,
+    });
+  };
+
   return (
     <div className=" h-16 px-4 py-3 flex gap-2 items-center bg-panel-header-background z-10">
       {isMobileView && (
         <div
           className="py-2 text-xl cursor-pointer hover:scale-110 duration-200 transition-all"
-          onClick={() => dispatch({ type: SHOW_CHATLIST })}
+          onClick={handleBack}
         >
           <MdArrowBack className="text-icon-lighter" />
         </div>

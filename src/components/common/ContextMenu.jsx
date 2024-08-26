@@ -21,17 +21,18 @@ function ContextMenu({ options, cordinates, contextMenu, setContextMenu }) {
 
   return (
     <div
-      className={`bg-dropdown-background shadow-sm mt-2 py-2 z-[200000] ${cordinates ? "fixed top-[${cordinates.y}] left-[${cordinates.x}]":"absolute top-full right-0"}`}
+      className={`bg-dropdown-background my-2 rounded-md flex flrx-col items-center shadow-sm mt-2 py-2 z-[200000] ${cordinates ? "fixed top-[${cordinates.y}] left-[${cordinates.x}]":"absolute top-full right-0"}`}
       ref={contextRef}
       // style={{top:cordinates.y, left:cordinates.x}}
     >
       <ul>
         {
-          options.map(({name, callback})=>(
+          options.map(({Icon, name, callback})=>(
             <li key={name} onClick={(e)=>handleClick(e, callback)}
-            className="px-5 py-2 cursor-pointer hover:bg-background-default-hover"
+            className="cursor-pointer flex items-center gap-4 py-3 px-5 hover:bg-dropdown-background-hover"
             >
-              <span className=" text-white">{name}</span>
+              <div className="text-xl text-icon-lighter">{Icon}</div>
+              <span className=" text-white text-nowrap">{name}</span>
             </li>
           ) )
         }
