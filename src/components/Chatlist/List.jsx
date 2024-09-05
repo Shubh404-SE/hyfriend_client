@@ -32,7 +32,7 @@ function List() {
 
   useEffect(() => {
     if (userInfo?.id) {
-      getContacts();
+      // getContacts();
     }
   }, [userInfo, refreshContacts]);
 

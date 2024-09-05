@@ -175,7 +175,7 @@ function Main() {
 
     };
     if (currentChatUser?.id && userInfo?.id) {
-      getMessages();
+      // getMessages();
     }
   }, [currentChatUser]);
 

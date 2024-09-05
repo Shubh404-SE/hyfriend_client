@@ -79,6 +79,16 @@ function Avatar({ type, image, setImage }) {
   return (
     <>
       <div className="flex items-center justify-center">
+      {type === "xs" && (
+          <div className=" relative h-6 w-6">
+            <Image
+              src={image ? image : `/default_avatar.png`}
+              alt="Avatar"
+              className=" rounded-full"
+              fill
+            />
+          </div>
+        )}
         {type === "sm" && (
           <div className=" relative h-10 w-10">
             <Image

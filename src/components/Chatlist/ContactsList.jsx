@@ -5,21 +5,26 @@ import axios, { all } from "axios";
 import React, { useEffect, useState } from "react";
 import { BiArrowBack, BiSearch } from "react-icons/bi";
 import ChatLIstItem from "./ChatLIstItem";
+import { MdGroupAdd } from "react-icons/md";
+import NewGroup from "./NewGroup";
 
 function ContactsList() {
   const [allContacts, setAllContacts] = useState([]);
   const [{}, dispatch] = useStateProvider();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchContacts, setSearchContacts] = useState([]);
+  const [showGroupComp, setShowGroupComp] = useState(false);
 
-  useEffect(()=>{
-    if(searchTerm.length){
+  useEffect(() => {
+    if (searchTerm.length) {
       const filteredData = {};
-      Object.keys(allContacts).forEach((key)=>{
-        filteredData[key] = allContacts[key].filter((obj) =>obj.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()));
+      Object.keys(allContacts).forEach((key) => {
+        filteredData[key] = allContacts[key].filter((obj) =>
+          obj.name.toLowerCase().includes(searchTerm.toLocaleLowerCase())
+        );
       });
       setSearchContacts(filteredData);
-    }else{
+    } else {
       setSearchContacts(allContacts);
     }
   }, [searchTerm]);
@@ -40,51 +45,70 @@ function ContactsList() {
   }, []);
 
   return (
-    <div className="h-full flex flex-col ">
-      <div className="h-24 flex items-end px-3 py-4">
-        <div className="flex items-center gap-12 text-white">
-          <BiArrowBack
-            className=" text-panel-header-icon cursor-pointer text-xl"
-            onClick={() => dispatch({ type: SET_ALL_CONTACTS_PAGE })}
-          />
-          <span>New chat</span>
-        </div>
-      </div>
-      <div className=" bg-search-input-container-background h-full flex-auto overflow-auto custom-scrollbar ">
-        <div className="flex items-center py-3 gap-3 h-14">
-          <div className=" bg-panel-header-background flex items-center gap-5 px-3 py-1 rounded-lg flex-grow mx-4">
-            <div>
-              <BiSearch className=" text-panel-header-icon cursor-pointer text-l" />
-            </div>
-            <div>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e)=>setSearchTerm(e.target.value)}
-                placeholder="Search contacts"
-                className=" bg-transparent text-sm focus:outline-none text-white w-full"
+    <>
+      {showGroupComp ? (
+        <NewGroup allContacts={allContacts} onBack={setShowGroupComp} />
+      ) : (
+        <div className="h-full flex flex-col ">
+          <div className="h-24 flex items-end px-3 py-4">
+            <div className="flex items-center gap-12 text-white">
+              <BiArrowBack
+                className=" text-panel-header-icon cursor-pointer text-xl"
+                onClick={() => dispatch({ type: SET_ALL_CONTACTS_PAGE })}
               />
+              <span>New chat</span>
             </div>
           </div>
-        </div>
-        {Object.entries(searchContacts).map(([initialLetter, userList]) => {
-          return (
-            <div key={Date.now() + initialLetter}>
-              {userList.length && <div className=" text-teal-light pl-10 py-5">{initialLetter}</div>}
-              {userList.map((user, index) => {
-                return (
-                  <ChatLIstItem
-                    key={user.id}
-                    data={user}
-                    isContactPage={true}
+          <div className=" bg-search-input-container-background h-full flex-auto overflow-auto custom-scrollbar ">
+            <div className="flex items-center py-3 gap-3 h-14">
+              <div className=" bg-panel-header-background flex items-center gap-5 px-3 py-1 rounded-lg flex-grow mx-4">
+                <div>
+                  <BiSearch className=" text-panel-header-icon cursor-pointer text-lg" />
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search contacts"
+                    className=" bg-transparent text-sm focus:outline-none text-white w-full"
                   />
-                );
-              })}
+                </div>
+              </div>
             </div>
-          );
-        })}
-      </div>
-    </div>
+            <div
+              onClick={() => setShowGroupComp(true)}
+              className="flex items-center gap-4 pl-10 py-2 cursor-pointer hover:bg-background-default-hover"
+            >
+              <div className="text-3xl p-2 bg-teal-light rounded-full">
+                <MdGroupAdd className="text-icon-lighter" />
+              </div>
+              <div className="text-xl text-white">New group</div>
+            </div>
+            {Object.entries(searchContacts).map(([initialLetter, userList]) => {
+              return (
+                <div key={Date.now() + initialLetter}>
+                  {userList.length && (
+                    <div className=" text-teal-light pl-10 py-5">
+                      {initialLetter}
+                    </div>
+                  )}
+                  {userList.map((user, index) => {
+                    return (
+                      <ChatLIstItem
+                        key={user.id}
+                        data={user}
+                        isContactPage={true}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
