@@ -137,6 +137,7 @@ function Main() {
           email,
           profilePicture: profileImage,
           about,
+          langauge,
         } = data.data;
 
         dispatch({
@@ -147,6 +148,7 @@ function Main() {
             email,
             profileImage,
             status: about,
+            langauge
           },
         });
       }

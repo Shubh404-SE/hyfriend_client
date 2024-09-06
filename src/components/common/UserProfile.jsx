@@ -4,10 +4,11 @@ import Avatar from "./Avatar";
 import { BiArrowBack, BiMessageRoundedDots } from "react-icons/bi";
 import { FaCircleUser, FaUserLarge } from "react-icons/fa6";
 import { SET_PROFILE_PAGE, SET_USER_INFO } from "@/context/constants";
-import { MdOutlineEmail } from "react-icons/md";
+import { MdOutlineEmail, MdOutlineTranslate } from "react-icons/md";
 import Loader from "./Loader";
 import { ONBOARD_USER_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
+import { languageList } from "lingva-scraper";
 
 const UserProfile = () => {
   const [{ userInfo, currentChatUser, profilePage, onlineUsers }, dispatch] =
@@ -26,10 +27,14 @@ const UserProfile = () => {
       ? userInfo.profileImage
       : currentChatUser.profilePicture
   );
+  const [lg, setLg] = useState(
+    profilePage === "user" ? userInfo.langauge : currentChatUser.langauge
+  );
 
   const [prevData, setPrevData] = useState({
     name: profilePage === "user" ? userInfo.name : currentChatUser.name,
     about: profilePage === "user" ? userInfo.status : currentChatUser.about,
+    lg: profilePage === "user" ? userInfo.langauge : currentChatUser.langauge,
     imgUrl:
       profilePage === "user"
         ? userInfo.profileImage
@@ -59,11 +64,9 @@ const UserProfile = () => {
           name,
           about,
           imgUrl,
+          lg,
         });
-
-        console.log(data.data.about);
         setIsLoading(false);
-
         if (data.status) {
           dispatch({
             type: SET_USER_INFO,
@@ -73,6 +76,7 @@ const UserProfile = () => {
               email,
               profileImage: imgUrl,
               status: data.data.about,
+              langauge: data.data.langauge,
             },
           });
           setIsEditProfile(false);
@@ -107,7 +111,7 @@ const UserProfile = () => {
           <span className="mx-auto text-2xl">Profile</span>
         </div>
       </div>
-      <div className="flex flex-col-reverse justify-end h-full w-full py-3 px-2 gap-1 overflow-auto custom-scrollbar bg-search-input-container-background">
+      <div className="flex flex-col-reverse justify-end h-full w-full py-3 px-2 gap-1 overflow-scroll scrollbar bg-search-input-container-background">
         <div className="flex flex-col gap-2 justify-start p-2">
           <div className="flex gap-1 items-center just -mx-3">
             <MdOutlineEmail className="text-3xl text-white" />
@@ -180,6 +184,32 @@ const UserProfile = () => {
             </div>
           </div>
 
+          <div className="flex gap-1 items-center -mx-3">
+            <MdOutlineTranslate className="text-3xl text-white" />
+            <div className=" flex flex-col gap-2 px-3 mb-5">
+              <label
+                htmlFor="lg"
+                className="text-sm font-semibold px-1 text-white"
+              >
+                Select langauge
+              </label>
+              <select
+                name="lg"
+                id="lg"
+                value={lg}
+                onChange={(e) => setLg(e.target.value)}
+                disabled={profilePage === "chatuser" ? true : !isEditProfile}
+                className="text-white bg-gray-800 w-full pl-8 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-800 scrollbar"
+              >
+                {Object.entries(languageList.all).map((lg) => (
+                  <option key={lg} value={lg[1]}>
+                    {lg[1]}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {profilePage === "user" && (
             <div className="flex items-center justify-center w-full">
               {!isEditProfile ? (
@@ -204,6 +234,7 @@ const UserProfile = () => {
                       setAbout(prevData.about);
                       setImg(prevData.imgUrl);
                       setName(prevData.name);
+                      setLg(prevData.lg);
                     }}
                   >
                     Discard

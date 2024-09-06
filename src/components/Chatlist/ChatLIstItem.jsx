@@ -34,14 +34,14 @@ function ChatListItem({ data, isContactPage }) {
     }
 
     dispatch({
-      type:REPLY_TO_MESSAGE,
-      data:undefined,
+      type: REPLY_TO_MESSAGE,
+      data: undefined,
     });
 
     dispatch({
       type: SHOW_CHATLIST,
     });
-    
+
     if (!isContactPage) {
       // Update the current chat user in state
       dispatch({
@@ -52,6 +52,7 @@ function ChatListItem({ data, isContactPage }) {
           profilePicture: data.profilePicture,
           email: data.email,
           id: userInfo.id === data.senderId ? data.recieverId : data.senderId,
+          langauge: data.langauge,
         },
       });
 
@@ -75,9 +76,12 @@ function ChatListItem({ data, isContactPage }) {
         userContacts: updatedContacts,
       });
     } else {
+      console.log(data);
       dispatch({
         type: CHANGE_CURRENT_CHAT_USER,
-        user: { ...data },
+        user: {
+          ...data,
+        },
       });
       dispatch({
         type: SET_ALL_CONTACTS_PAGE,

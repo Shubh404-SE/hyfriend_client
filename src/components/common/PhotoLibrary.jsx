@@ -16,7 +16,7 @@ function PhotoLibrary({setImage, hidePhotoLibrary}) {
     "/avatars/9.png",
   ];
   return (
-  <div className="fixed top-0 left-0 max-h-[100vh] max-w-[100vh] h-full w-full flex justify-end items-center">
+  <div className="fixed top-0 left-0 max-h-[100vh] max-w-[100vh] h-full w-full flex justify-end items-center z-50">
     <div className="h-max w-max bg-gray-900 gap-6 rounded-lg p-4">
       <div className="pt-2 pe-2 cursor-pointer flex items-end justify-end" onClick={()=>hidePhotoLibrary(false)}>
       <IoClose className="h-10 w-10 cursor-pointer"/>

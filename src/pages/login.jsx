@@ -18,6 +18,7 @@ import ToastMessage from "@/components/common/ToastMessage";
 import { MdOutlineEmail } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { FaCircleUser } from "react-icons/fa6";
+import Input from "@/components/common/Input";
 
 function login() {
   const router = useRouter();
@@ -91,56 +92,55 @@ function login() {
           firebaseAuth,
           data.email,
           data.password
-        )
-          .then(async (userCredential) => {
-            // Signed in
-            const user = userCredential.user;
-            // console.log(user);
-            const { data: loginUser } = await axios.post(CHECK_USER_ROUTE, {
-              email: data.email,
-            });
+        ).then(async (userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          // console.log(user);
+          const { data: loginUser } = await axios.post(CHECK_USER_ROUTE, {
+            email: data.email,
+          });
 
-            const { name, email, profilePicture } = loginUser.data;
-            setIsLoading(false);
-            if (!loginUser.status) {
-              if (loginUser.data.onboard === false) {
-                // user exist but havn't done onboard
-                console.log(loginUser);
-                dispatch({
-                  type: SET_USER_INFO,
-                  userInfo: {
-                    name,
-                    email,
-                    profileImage: profilePicture,
-                    status: "Active",
-                  },
-                });
-                router.push("/onboarding");
-              } else {
-                // user not exist
-                setIsSignup(true);
-              }
-            } else {
-              const {
-                id,
-                name,
-                email,
-                profilePicture: profileImage,
-                status,
-              } = loginUser.data;
+          const { name, email, profilePicture } = loginUser.data;
+          setIsLoading(false);
+          if (!loginUser.status) {
+            if (loginUser.data.onboard === false) {
+              // user exist but havn't done onboard
+              console.log(loginUser);
               dispatch({
                 type: SET_USER_INFO,
                 userInfo: {
-                  id,
                   name,
                   email,
-                  profileImage,
-                  status,
+                  profileImage: profilePicture,
+                  status: "Active",
                 },
               });
-              router.push("/");
+              router.push("/onboarding");
+            } else {
+              // user not exist
+              setIsSignup(true);
             }
-          })
+          } else {
+            const {
+              id,
+              name,
+              email,
+              profilePicture: profileImage,
+              status,
+            } = loginUser.data;
+            dispatch({
+              type: SET_USER_INFO,
+              userInfo: {
+                id,
+                name,
+                email,
+                profileImage,
+                status,
+              },
+            });
+            router.push("/");
+          }
+        });
       },
       {
         pending: "Loading",
@@ -187,54 +187,30 @@ function login() {
               <div className="mt-4 text-xs text-center text-gray-500 uppercase">
                 or login with email
               </div>
-              <div className="flex -mx-3">
-                <div className="w-full px-3 mb-5">
-                  <label htmlFor="email" className="text-xs font-semibold px-1">
-                    Email
-                  </label>
-                  <div className="flex">
-                    <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      <MdOutlineEmail className="mdi mdi-email-outline text-gray-400 text-lg" />
-                    </div>
-                    <input
-                      type="email"
-                      name="email"
-                      value={data?.email}
-                      onChange={(e) =>
-                        setData((prev) =>
-                          setData({ ...prev, email: e.target.value })
-                        )
-                      }
-                      className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-800"
-                      placeholder="johnsmith@example.com"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="flex -mx-3">
-                <div className="w-full px-3 mb-12">
-                  <label htmlFor="password" className="text-xs font-semibold px-1">
-                    Password
-                  </label>
-                  <div className="flex">
-                    <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                    <RiLockPasswordLine  className="mdi mdi-lock-outline text-gray-400 text-lg" />
-                    </div>
-                    <input
-                      type="password"
-                      name="password"
-                      value={data?.password}
-                      onChange={(e) =>
-                        setData((prev) =>
-                          setData({ ...prev, password: e.target.value })
-                        )
-                      }
-                      className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-800"
-                      placeholder="************"
-                    />
-                  </div>
-                </div>
-              </div>
+              <Input
+                name="Email"
+                state={data?.email}
+                type="email"
+                placeholder="johnsmith@example.com"
+                Icon={MdOutlineEmail}
+                setState={(e) =>
+                  setData((prev) => setData({ ...prev, email: e.target.value }))
+                }
+                label
+              />
+              <Input
+                name="Password"
+                state={data?.password}
+                type="password"
+                placeholder="************"
+                Icon={RiLockPasswordLine}
+                setState={(e) =>
+                  setData((prev) =>
+                    setData({ ...prev, password: e.target.value })
+                  )
+                }
+                label
+              />
               <div className="mt-8">
                 <button
                   onClick={signin}
@@ -262,78 +238,41 @@ function login() {
                 <p>Enter your information to register</p>
               </div>
               <div>
-                <div className="flex -mx-3">
-                  <div className="w-full px-3 mb-5">
-                    <label htmlFor="name" className="text-xs font-semibold px-1">
-                      Name
-                    </label>
-                    <div className="flex">
-                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      <FaCircleUser className="mdi mdi-email-outline text-gray-400 text-lg" />
-                      </div>
-                      <input
-                        type="text"
-                        name="name"
-                        value={data?.name}
-                        onChange={(e) =>
-                          setData((prev) =>
-                            setData({ ...prev, name: e.target.value })
-                          )
-                        }
-                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-800"
-                        placeholder="John Smith"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex -mx-3">
-                  <div className="w-full px-3 mb-5">
-                    <label htmlFor="email" className="text-xs font-semibold px-1">
-                      Email
-                    </label>
-                    <div className="flex">
-                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                       <MdOutlineEmail className="mdi mdi-email-outline text-gray-400 text-lg" />
-                      </div>
-                      <input
-                        type="email"
-                        name="email"
-                        value={data?.email}
-                        onChange={(e) =>
-                          setData((prev) =>
-                            setData({ ...prev, email: e.target.value })
-                          )
-                        }
-                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-800"
-                        placeholder="johnsmith@example.com"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex -mx-3">
-                  <div className="w-full px-3 mb-12">
-                    <label htmlFor="password" className="text-xs font-semibold px-1">
-                      Password
-                    </label>
-                    <div className="flex">
-                      <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      <RiLockPasswordLine  className="mdi mdi-lock-outline text-gray-400 text-lg" />
-                      </div>
-                      <input
-                        type="password"
-                        name="password"
-                        value={data?.password}
-                        onChange={(e) =>
-                          setData((prev) =>
-                            setData({ ...prev, password: e.target.value })
-                          )
-                        }
-                        className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-800"
-                        placeholder="************"
-                      />
-                    </div>
-                  </div>
-                </div>
+                <Input
+                  name="Name"
+                  state={data?.name}
+                  type="text"
+                  placeholder="John Smith"
+                  Icon={FaCircleUser}
+                  setState={(e) => setData((prev) => setData({ ...prev, name: e.target.value }))}
+                  label
+                />
+                <Input
+                  name="Email"
+                  state={data?.email}
+                  type="email"
+                  placeholder="johnsmith@example.com"
+                  Icon={MdOutlineEmail}
+                  setState={(e) =>
+                    setData((prev) =>
+                      setData({ ...prev, email: e.target.value })
+                    )
+                  }
+                  label
+                />
+                <Input
+                  name="Password"
+                  state={data?.password}
+                  type="password"
+                  placeholder="************"
+                  Icon={RiLockPasswordLine}
+                  setState={(e) =>
+                    setData((prev) =>
+                      setData({ ...prev, password: e.target.value })
+                    )
+                  }
+                  label
+                />
                 <div className="flex -mx-3">
                   <div className="w-full px-3 mb-5">
                     <button
