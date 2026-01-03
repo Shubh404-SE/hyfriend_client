@@ -33,7 +33,6 @@ function login() {
   });
 
   useEffect(() => {
-    // console.log(userInfo, newUser);
     if (userInfo?.id && !newUser) router.push("/");
   }, [userInfo, newUser, router]);
 
@@ -50,14 +49,13 @@ function login() {
       .then(async (userCredential) => {
         // Signed up
         const user = userCredential.user;
-        console.log(user);
         // store user in database
         try {
           const { data: signupUser } = await axios.post(SIGNUP_USER_ROUTE, {
             email: data.email,
             name: data.name,
           });
-          console.log(signupUser);
+
 
           // remove loading
           setIsLoading(false);
@@ -68,17 +66,16 @@ function login() {
               type: SET_NEW_USER,
               newUser: true,
             });
-            console.log("user register in database");
             setIsSignup(false);
           }
         } catch (err) {
-          console.log(err);
+          if (process.env.NODE_ENV !== "production") console.error(err);
         }
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorMessage);
+        if (process.env.NODE_ENV !== "production") console.error(errorMessage);
         setIsLoading(false);
       });
   };
@@ -95,7 +92,6 @@ function login() {
         ).then(async (userCredential) => {
           // Signed in
           const user = userCredential.user;
-          // console.log(user);
           const { data: loginUser } = await axios.post(CHECK_USER_ROUTE, {
             email: data.email,
           });
@@ -105,7 +101,6 @@ function login() {
           if (!loginUser.status) {
             if (loginUser.data.onboard === false) {
               // user exist but havn't done onboard
-              console.log(loginUser);
               dispatch({
                 type: SET_USER_INFO,
                 userInfo: {

@@ -83,7 +83,7 @@ const MessageBox = ({ message, index }) => {
         });
       }
     } catch (err) {
-      console.log(err);
+      if (process.env.NODE_ENV !== "production") console.error(err);
       toast.error(err, {
         autoClose: 1000,
       });

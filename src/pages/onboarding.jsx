@@ -65,7 +65,7 @@ function onboarding() {
           router.push("/");
         }
       } catch (err) {
-        console.log(err);
+        if (process.env.NODE_ENV !== "production") console.error(err);
         setIsLoading(false);
       }
     }

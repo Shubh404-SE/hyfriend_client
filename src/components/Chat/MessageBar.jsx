@@ -49,7 +49,6 @@ function MessageBar() {
     if (file) {
       const blockurl = URL.createObjectURL(file);
       setAttachmentPreview(blockurl);
-      console.log(blockurl);
     }
   };
 
@@ -191,7 +190,7 @@ function MessageBar() {
         setPhotoMessage(null);
       }
     } catch (err) {
-      console.log(err);
+      if (process.env.NODE_ENV !== "production") console.error(err);
     }
   };
 
@@ -260,7 +259,7 @@ function MessageBar() {
           from: userInfo.id,
         });
       } catch (err) {
-        console.log(err);
+        if (process.env.NODE_ENV !== "production") console.error(err);
       }
     } else if (photoMessage) {
       sendPhotoMessage(photoMessage);

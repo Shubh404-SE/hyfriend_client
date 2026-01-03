@@ -76,7 +76,6 @@ function ChatListItem({ data, isContactPage }) {
         userContacts: updatedContacts,
       });
     } else {
-      console.log(data);
       dispatch({
         type: CHANGE_CURRENT_CHAT_USER,
         user: {

@@ -133,7 +133,7 @@ function CaptureAudio({ hide }) {
         hide(false);
       }
     }catch (err) {
-      console.log(err);
+      if (process.env.NODE_ENV !== "production") console.error(err);
     }
   };
 
@@ -167,7 +167,7 @@ function CaptureAudio({ hide }) {
   
       mediaRecorder.start();
     }).catch(err => {
-      console.log("Error accessing microphone", err);
+      if (process.env.NODE_ENV !== "production") console.error("Error accessing microphone", err);
     });
   };
   

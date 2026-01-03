@@ -34,7 +34,7 @@ function Container({ data }) {
         } = await axios.get(`${GET_CALL_TOKEN}/${userInfo.id}`);
         setToken(returenedToken);
       } catch (err) {
-        console.log(err);
+        if (process.env.NODE_ENV !== "production") console.error(err);
       }
     };
     getToken();

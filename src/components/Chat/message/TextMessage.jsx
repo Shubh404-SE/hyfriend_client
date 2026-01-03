@@ -52,9 +52,8 @@ function TextMessage({ message, preview }) {
         const result = await model.generateContent(prompt);
         setTranslatedText(result.response.text());
         setIsTranslating(false);
-        // console.log(prompt, result.response.text());
       } catch (err) {
-        console.log(err);
+        if (process.env.NODE_ENV !== "production") console.error(err);
         setIsTranslating(false);
       }
     } else {
