@@ -63,6 +63,7 @@ function Main() {
   const [isMobileView, setIsMobileView] = useState(
     typeof window !== "undefined" ? window.innerWidth <= 600 : false
   ); /// for mobile view
+  
 
   useEffect(() => {
     const handleResize = () => {
